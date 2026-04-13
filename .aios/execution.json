@@ -1,0 +1,36 @@
+{
+  "execution_id": "exec_1776067165201_planner",
+  "project_id": "pipeline-runner",
+  "role": "planner",
+  "mode": "EXECUTE",
+  "goal": "Build a fully local deterministic orchestration module that runs the five completed video-language-transformation subprojects as one end-to-end pipeline, passes artifacts between them through explicit contracts, validates each stage boundary, and produces a final pipeline report with downstream-ready outputs.",
+  "constraints": [],
+  "success_criteria": [],
+  "current_work_id": null,
+  "work_id": null,
+  "issue_id": null,
+  "request_path": ".aios/request.json",
+  "plan_path": null,
+  "created_at": "2026-04-13T07:59:25.201Z",
+  "output_file": ".aios/agent-results/planner.json",
+  "request": {
+    "project_id": "pipeline-runner",
+    "goal": "Build a fully local deterministic orchestration module that runs the five completed video-language-transformation subprojects as one end-to-end pipeline, passes artifacts between them through explicit contracts, validates each stage boundary, and produces a final pipeline report with downstream-ready outputs."
+  },
+  "plan": null,
+  "issue": null,
+  "state": {
+    "project_id": "pipeline-runner",
+    "status": "READY",
+    "phase": "PLANNING",
+    "current_role": "planner",
+    "current_work_id": null,
+    "completed_roles": [],
+    "completed_work_items": [],
+    "open_issue_id": null,
+    "force_review": false,
+    "review_work_id": null,
+    "blocked_issue_id": null,
+    "updated_at": "2026-04-13T07:51:54.462Z"
+  }
+}

@@ -1,0 +1,2 @@
+{"ts":"2026-04-13T07:59:25.199Z","project_id":"pipeline-runner","event":"RUN_START","current_role":"planner","current_work_id":null,"open_issue_id":null}
+{"ts":"2026-04-13T07:59:25.202Z","project_id":"pipeline-runner","event":"AGENT_WAITING","role":"planner","prompt_file":"projects/pipeline-runner/.aios/planner-prompt.txt","result_file":"projects/pipeline-runner/.aios/agent-results/planner.json"}

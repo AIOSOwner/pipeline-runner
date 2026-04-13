@@ -1,0 +1,11 @@
+{
+  "project_id": "pipeline-runner",
+  "role": "planner",
+  "execution_id": "exec_1776067165201_planner",
+  "input_file": "projects/pipeline-runner/.aios/planner-input.json",
+  "prompt_file": "projects/pipeline-runner/.aios/planner-prompt.txt",
+  "result_file": "projects/pipeline-runner/.aios/agent-results/planner.json",
+  "archived_result_file": null,
+  "status": "WAITING",
+  "updated_at": "2026-04-13T07:59:25.202Z"
+}
