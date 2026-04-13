@@ -1,334 +1,351 @@
 {
-    "execution_id": "exec_1775876593237_planner",
+  "execution_id": "exec_1776091547668_planner",
+  "plan": {
+    "constraints": [
+      "Runner must treat all sub-projects as blackbox stages",
+      "Runner must not import or rely on internal code of any sub-project",
+      "Runner must invoke stages only via CLI using unified interface",
+      "Each stage must be executed using: node src/index.js --input_json=... --output_dir=...",
+      "Runner must only read stage outputs from stage_output.json",
+      "Runner must not infer or reconstruct artifacts",
+      "Runner must fail immediately if any stage returns status FAILED",
+      "Runner must not mutate stage artifacts",
+      "All execution must be deterministic (no timestamps, no randomness)",
+      "All paths must be explicit and reproducible",
+      "Stages must execute strictly in defined order",
+      "Each stage must have its own isolated output directory",
+      "Runner must persist input_json for each stage",
+      "Runner must persist stage_output.json for each stage",
+      "Runner must build a pipeline_report.json summarizing all stages",
+      "Runner must include stage execution status, artifacts, and timing in report",
+      "Runner must not auto-generate missing artifacts",
+      "If required artifact is missing, pipeline must fail"
+    ],
+    "execution_order": [
+      "work_1_stage_runtime_and_workspace",
+      "work_2_pipeline_wiring_and_artifact_resolution",
+      "work_3_end_to_end_validation_and_final_outputs"
+    ],
+    "goal": "Build a deterministic orchestration runner that executes a fixed sequence of blackbox video processing stages using a unified stage interface and produces a final composed video with full execution trace.",
+    "plan_id": "pipeline_runner_blackbox_v1",
     "project_id": "pipeline-runner",
-    "role": "planner",
-    "plan": {
-      "plan_id": "pipeline_runner_plan_v3_final",
-      "project_id": "pipeline-runner",
-      "goal": "Build a fully local deterministic orchestration module that runs the five completed video-language-transformation subprojects as one end-to-end pipeline, passes artifacts between them through explicit contracts, validates each stage boundary, and produces a final pipeline report with downstream-ready outputs.",
-      "summary": "Deterministic sequential pipeline runner with strict execution contract, isolated workspace, explicit artifact mapping, strong validation, and machine-readable reporting. Runner orchestrates and validates only, never modifies artifacts.",
-      "constraints": [
-        "Fully local execution only",
-        "Deterministic outputs for identical inputs",
-        "Strict sequential execution only",
-        "Fail-fast on any stage error",
-        "No implicit artifact discovery",
-        "All paths must be explicit and stable",
-        "Runner must not modify artifacts",
-        "Runner must only orchestrate and validate",
-        "All processing logic belongs to subprojects"
+    "summary": "Refactor pipeline-runner around a blackbox stage runtime: first implement deterministic stage invocation, isolated workspace layout, input_json persistence, and stage_output validation; then wire the five standardized stages through explicit artifact resolution and final output projection; finally harden the runner with end-to-end tests, report validation, and final artifact checks."
+  },
+  "project_id": "pipeline-runner",
+  "role": "planner",
+  "work_items": [
+    {
+      "acceptance_criteria": [
+        "Runner can invoke a blackbox stage only via CLI using input_json and output_dir",
+        "Each stage run persists its exact input_json and reads exactly one stage_output.json from the stage output directory",
+        "Runner validates stage_output.json structure and fails if status is FAILED or required fields are missing",
+        "Workspace layout is deterministic and stage-isolated under projects/pipeline-runner/runtime/stages/<stage_id>/",
+        "No runner code imports any source file from sub-project repositories"
       ],
-      "execution_order": [
-        "work_1_runner_and_execution_contract",
-        "work_2_workspace_and_contract_mapping",
-        "work_3_validation_layer",
-        "work_4_report_and_outputs",
-        "work_5_review",
-        "work_6_e2e_test"
-      ]
+      "allowed_paths": [
+        "projects/pipeline-runner/src/**",
+        "projects/pipeline-runner/tests/**",
+        "projects/pipeline-runner/package.json",
+        "projects/pipeline-runner/README.md"
+      ],
+      "artifact_expectations": {
+        "stage_input_json": "Persisted as projects/pipeline-runner/runtime/stages/<stage_id>/input.json",
+        "stage_output_json": "Read from projects/pipeline-runner/runtime/stages/<stage_id>/stage_output.json",
+        "stage_runtime_dir": "Created as projects/pipeline-runner/runtime/stages/<stage_id>/"
+      },
+      "deliverables": [
+        "blackbox stage invocation runtime",
+        "deterministic workspace builder",
+        "stage_output.json validator",
+        "tests covering invoke, fail-fast, and workspace layout"
+      ],
+      "depends_on": [],
+      "forbidden_dependencies": [
+        "projects/pipeline-runner/.aios/request.json"
+      ],
+      "forbidden_paths": [
+        "projects/video-ingest-standardizer/**",
+        "projects/audio-transcript-transformer/**",
+        "projects/subtitle-video-rebuilder/**",
+        "projects/dubbed-audio-rebuilder/**",
+        "projects/video-final-composer/**"
+      ],
+      "goal": "Replace legacy runner assumptions with a deterministic blackbox stage runtime that only knows how to write input_json, invoke a stage CLI, and validate stage_output.json.",
+      "kind": "implementation",
+      "phase_id": "phase_1",
+      "repair_notes": [
+        "If coder needs to import sub-project code, the plan is wrong and implementation must fail",
+        "If tests require direct knowledge of sub-project internals, that indicates contract leakage and should be fixed in runner tests instead",
+        "If stage_output validation is too weak to catch missing artifacts or FAILED status, that is a planning issue because later works depend on strict contract enforcement"
+      ],
+      "required_artifacts": [],
+      "resolved_inputs": {
+        "project_root": "projects/pipeline-runner",
+        "runtime_root": "projects/pipeline-runner/runtime",
+        "stage_order_reference": [
+          "ingest",
+          "transcript",
+          "subtitle",
+          "dub_audio",
+          "final"
+        ],
+        "subproject_entrypoints": {
+          "ingest": "projects/video-ingest-standardizer/src/index.js",
+          "transcript": "projects/audio-transcript-transformer/src/index.js",
+          "subtitle": "projects/subtitle-video-rebuilder/src/index.js",
+          "dub_audio": "projects/dubbed-audio-rebuilder/src/index.js",
+          "final": "projects/video-final-composer/src/index.js"
+        }
+      },
+      "resolved_output_paths": {
+        "runtime_root": "projects/pipeline-runner/runtime",
+        "stages_root": "projects/pipeline-runner/runtime/stages",
+        "ingest_stage_dir": "projects/pipeline-runner/runtime/stages/ingest",
+        "transcript_stage_dir": "projects/pipeline-runner/runtime/stages/transcript",
+        "subtitle_stage_dir": "projects/pipeline-runner/runtime/stages/subtitle",
+        "dub_audio_stage_dir": "projects/pipeline-runner/runtime/stages/dub_audio",
+        "final_stage_dir": "projects/pipeline-runner/runtime/stages/final"
+      },
+      "review_required": true,
+      "role": "coder",
+      "scope_summary": "Implement the runner core that creates isolated stage directories, persists input_json, invokes stage CLIs deterministically, and validates stage_output.json without any knowledge of sub-project internals.",
+      "test_required": true,
+      "title": "Implement blackbox stage runtime and deterministic workspace",
+      "verification_steps": [
+        "Run the runner unit tests that simulate stage invocation and stage_output validation",
+        "Verify each stage runtime directory path is deterministic and isolated",
+        "Verify the runner fails immediately when stage_output.json is missing, malformed, or FAILED"
+      ],
+      "work_id": "work_1_stage_runtime_and_workspace"
     },
-    "work_items": [
-      {
-        "work_id": "work_1_runner_and_execution_contract",
-        "phase_id": "phase_1",
-        "title": "Implement pipeline runner and single execution model",
-        "role": "coder",
-        "kind": "implementation",
-        "goal": "Create deterministic pipeline runner with a single explicit stage execution model.",
-        "scope_summary": "Implement runPipeline, CLI entrypoint, and enforce a single consistent stage invocation model.",
-        "allowed_paths": [
-          "projects/pipeline-runner/src/**",
-          "projects/pipeline-runner/tests/**",
-          "projects/pipeline-runner/package.json",
-          "projects/pipeline-runner/README.md"
+    {
+      "acceptance_criteria": [
+        "Runner executes ingest, transcript, subtitle, dub_audio, and final in strict order using only persisted input_json and stage_output.json",
+        "Inter-stage artifact routing uses logical artifact names from stage_output.json rather than hardcoded sub-project internals",
+        "Runner fails when any required upstream artifact logical name is absent or resolves to a missing file",
+        "Final runner outputs include projects/pipeline-runner/runtime/final_video.mp4 and projects/pipeline-runner/runtime/pipeline_report.json",
+        "pipeline_report.json is deterministic and includes per-stage status, artifacts, and final_video_path"
+      ],
+      "allowed_paths": [
+        "projects/pipeline-runner/src/**",
+        "projects/pipeline-runner/tests/**",
+        "projects/pipeline-runner/package.json",
+        "projects/pipeline-runner/README.md"
+      ],
+      "artifact_expectations": {
+        "ingest_required_outputs": [
+          "timeline_json",
+          "audio_source_wav"
         ],
-        "forbidden_paths": [
-          "projects/video-*/**"
+        "transcript_required_outputs": [
+          "transcript_json",
+          "translated_transcript_json"
         ],
-        "resolved_inputs": {
-          "video_path": "CLI argument",
-          "output_dir": "CLI argument"
-        },
-        "resolved_output_paths": {
-          "workspace_root": "projects/pipeline-runner/runtime/"
-        },
-        "required_artifacts": [],
-        "artifact_expectations": {},
-        "deliverables": [
-          "runPipeline function",
-          "CLI entrypoint",
-          "stage invocation wrapper"
+        "subtitle_required_outputs": [
+          "subtitles_original_srt",
+          "subtitles_translated_srt"
         ],
-        "acceptance_criteria": [
-          "Single execution model used for all stages",
-          "Stages invoked deterministically",
-          "Fail-fast enforced",
-          "No implicit behavior"
+        "dub_audio_required_outputs": [
+          "full_audio_wav"
         ],
-        "verification_steps": [
-          "Run pipeline",
-          "Verify execution order",
-          "Verify failure stops pipeline"
-        ],
-        "depends_on": [],
-        "forbidden_dependencies": [
-          "projects/pipeline-runner/.aios/request.json"
-        ],
-        "repair_notes": [
-          "If multiple execution styles exist → FAIL",
-          "If CLI behavior differs between stages → FAIL"
-        ],
-        "review_required": true,
-        "test_required": true,
-        "stage_execution_rules": [
-          "Pipeline runner must use one single documented execution model for all stage invocations.",
-          "The chosen execution model must be implemented consistently in code, tests, and docs.",
-          "Runner must not support parallel invocation models.",
-          "Each stage must receive explicit input paths.",
-          "Runner must pass explicit output_dir per stage.",
-          "Stage outputs must be resolved from output_dir only."
+        "final_required_outputs": [
+          "final_video_mp4",
+          "composition_report_json",
+          "manifest_json"
         ]
       },
-      {
-        "work_id": "work_2_workspace_and_contract_mapping",
-        "phase_id": "phase_2",
-        "title": "Implement workspace and artifact contracts",
-        "role": "coder",
-        "kind": "integration",
-        "goal": "Create isolated workspace and explicit artifact mapping across stages.",
-        "scope_summary": "Define stage directories and map artifacts strictly between stages.",
-        "allowed_paths": [
-          "projects/pipeline-runner/src/**",
-          "projects/pipeline-runner/tests/**"
-        ],
-        "resolved_inputs": {},
-        "resolved_output_paths": {
-          "ingest": "projects/pipeline-runner/runtime/stages/ingest/",
-          "transcript": "projects/pipeline-runner/runtime/stages/transcript/",
-          "dubbing": "projects/pipeline-runner/runtime/stages/dubbing/",
-          "subtitle": "projects/pipeline-runner/runtime/stages/subtitle/",
-          "final": "projects/pipeline-runner/runtime/stages/final/",
-          "contracts": "projects/pipeline-runner/runtime/contracts.json"
+      "deliverables": [
+        "pipeline stage graph wiring for the fixed five-stage sequence",
+        "artifact resolver that maps logical names to concrete runtime paths",
+        "deterministic pipeline_report.json writer",
+        "final output projection from stage artifacts to runtime root",
+        "tests covering artifact routing and fail-fast behavior"
+      ],
+      "depends_on": [
+        "work_1_stage_runtime_and_workspace"
+      ],
+      "forbidden_dependencies": [
+        "projects/pipeline-runner/.aios/request.json"
+      ],
+      "forbidden_paths": [
+        "projects/video-ingest-standardizer/**",
+        "projects/audio-transcript-transformer/**",
+        "projects/subtitle-video-rebuilder/**",
+        "projects/dubbed-audio-rebuilder/**",
+        "projects/video-final-composer/**"
+      ],
+      "goal": "Wire the runner to the five standardized blackbox stages using explicit artifact routing and deterministic pipeline reporting.",
+      "kind": "integration",
+      "phase_id": "phase_2",
+      "repair_notes": [
+        "If coder needs to hardcode internal sub-project filenames beyond logical artifact names already exposed by stage_output.json, that indicates a planning violation",
+        "If pipeline_report.json includes timestamps or unstable runtime values, later determinism checks will fail and should be treated as implementation failure",
+        "If final output projection requires synthesizing or reconstructing a missing artifact, the work must fail because runner mutation is forbidden"
+      ],
+      "required_artifacts": [
+        "projects/pipeline-runner/runtime/stages/ingest/stage_output.json",
+        "projects/pipeline-runner/runtime/stages/transcript/stage_output.json",
+        "projects/pipeline-runner/runtime/stages/subtitle/stage_output.json",
+        "projects/pipeline-runner/runtime/stages/dub_audio/stage_output.json",
+        "projects/pipeline-runner/runtime/stages/final/stage_output.json"
+      ],
+      "resolved_inputs": {
+        "pipeline_inputs": {
+          "video_path": "project runtime input video_path",
+          "target_language": "project runtime input target_language"
         },
-        "required_artifacts": [],
-        "artifact_expectations": {
-          "video_reference": "projects/pipeline-runner/runtime/stages/ingest/input_video_ref.json",
-          "audio": "runtime/stages/ingest/audio/source_full.wav",
-          "timeline": "runtime/stages/ingest/timeline.json",
-          "translated_transcript": "runtime/stages/transcript/translated_transcript.json",
-          "dubbed_audio": "runtime/stages/dubbing/dubbed_audio/full.wav",
-          "subtitle": "runtime/stages/subtitle/subtitles_translated.srt"
-        },
-        "deliverables": [
-          "workspace structure",
-          "contracts.json",
-          "artifact mapping logic"
-        ],
-        "acceptance_criteria": [
-          "Each stage has isolated directory",
-          "No artifact inferred",
-          "video_path represented as reference artifact",
-          "All paths deterministic"
-        ],
-        "verification_steps": [
-          "Inspect workspace layout",
-          "Inspect contracts.json"
-        ],
-        "depends_on": [
-          "work_1_runner_and_execution_contract"
-        ],
-        "forbidden_dependencies": [
-          "projects/pipeline-runner/.aios/request.json"
-        ],
-        "repair_notes": [
-          "If raw string path used instead of reference artifact → FAIL",
-          "If any stage reads outside its directory → FAIL"
-        ],
-        "review_required": true,
-        "test_required": true,
-        "workspace_rules": [
-          "Each stage must have isolated output_dir",
-          "runtime/stages/ingest/",
-          "runtime/stages/transcript/",
-          "runtime/stages/dubbing/",
-          "runtime/stages/subtitle/",
-          "runtime/stages/final/"
-        ],
-        "artifact_contract_rules": [
-          "String references must be materialized as artifacts",
-          "No special-case raw path handling"
-        ]
+        "stage_definitions": {
+          "ingest": {
+            "project_id": "video-ingest-standardizer",
+            "input_json_fields": {
+              "video_path": "project input video_path"
+            }
+          },
+          "transcript": {
+            "project_id": "audio-transcript-transformer",
+            "input_json_fields": {
+              "audio_path": "ingest.artifacts.audio_source_wav",
+              "timeline_path": "ingest.artifacts.timeline_json",
+              "target_language": "project input target_language"
+            }
+          },
+          "subtitle": {
+            "project_id": "subtitle-video-rebuilder",
+            "input_json_fields": {
+              "video_path": "project input video_path",
+              "timeline_path": "ingest.artifacts.timeline_json",
+              "transcript_path": "transcript.artifacts.transcript_json",
+              "translated_transcript_path": "transcript.artifacts.translated_transcript_json"
+            }
+          },
+          "dub_audio": {
+            "project_id": "dubbed-audio-rebuilder",
+            "input_json_fields": {
+              "timeline_path": "ingest.artifacts.timeline_json",
+              "translated_transcript_path": "transcript.artifacts.translated_transcript_json"
+            }
+          },
+          "final": {
+            "project_id": "video-final-composer",
+            "input_json_fields": {
+              "video_path": "project input video_path",
+              "timeline_path": "ingest.artifacts.timeline_json",
+              "dubbed_audio_path": "dub_audio.artifacts.full_audio_wav"
+            }
+          }
+        }
       },
-      {
-        "work_id": "work_3_validation_layer",
-        "phase_id": "phase_3",
-        "title": "Implement strict validation",
-        "role": "coder",
-        "kind": "validation",
-        "goal": "Validate artifacts and enforce cross-stage consistency.",
-        "scope_summary": "Validate JSON, audio duration, timeline consistency, and final video composition.",
-        "allowed_paths": [
-          "projects/pipeline-runner/src/**",
-          "projects/pipeline-runner/tests/**"
-        ],
-        "resolved_inputs": {},
-        "resolved_output_paths": {
-          "validation_report": "projects/pipeline-runner/runtime/validation_report.json"
-        },
-        "required_artifacts": [],
-        "artifact_expectations": {},
-        "deliverables": [
-          "validation module",
-          "validation_report.json"
-        ],
-        "acceptance_criteria": [
-          "Dubbed audio duration equals timeline",
-          "Segment count preserved",
-          "Final video has one audio stream",
-          "Fail on any violation"
-        ],
-        "verification_steps": [
-          "Inject invalid data",
-          "Verify pipeline fails"
-        ],
-        "depends_on": [
-          "work_2_workspace_and_contract_mapping"
-        ],
-        "forbidden_dependencies": [
-          "projects/pipeline-runner/.aios/request.json"
-        ],
-        "repair_notes": [
-          "If validation allows mismatch → FAIL"
-        ],
-        "review_required": true,
-        "test_required": true,
-        "validation_rules": [
-          "Dubbed audio duration must equal timeline end",
-          "translated_transcript.json must preserve segment count",
-          "final video must contain exactly one audio stream",
-          "timeline consistency must be enforced"
-        ]
+      "resolved_output_paths": {
+        "pipeline_report": "projects/pipeline-runner/runtime/pipeline_report.json",
+        "final_video_root_projection": "projects/pipeline-runner/runtime/final_video.mp4",
+        "ingest_stage_output": "projects/pipeline-runner/runtime/stages/ingest/stage_output.json",
+        "transcript_stage_output": "projects/pipeline-runner/runtime/stages/transcript/stage_output.json",
+        "subtitle_stage_output": "projects/pipeline-runner/runtime/stages/subtitle/stage_output.json",
+        "dub_audio_stage_output": "projects/pipeline-runner/runtime/stages/dub_audio/stage_output.json",
+        "final_stage_output": "projects/pipeline-runner/runtime/stages/final/stage_output.json"
       },
-      {
-        "work_id": "work_4_report_and_outputs",
-        "phase_id": "phase_4",
-        "title": "Generate pipeline report and outputs",
-        "role": "coder",
-        "kind": "implementation",
-        "goal": "Produce final outputs and pipeline report.",
-        "scope_summary": "Generate final_video and pipeline_report.json.",
-        "allowed_paths": [
-          "projects/pipeline-runner/src/**",
-          "projects/pipeline-runner/runtime/**",
-          "projects/pipeline-runner/tests/**"
-        ],
-        "resolved_inputs": {},
-        "resolved_output_paths": {
-          "final_video": "projects/pipeline-runner/runtime/stages/final/final_video.mp4",
-          "report": "projects/pipeline-runner/runtime/pipeline_report.json"
-        },
-        "required_artifacts": [],
-        "artifact_expectations": {},
-        "deliverables": [
-          "pipeline_report.json"
-        ],
-        "acceptance_criteria": [
-          "Report contains stages, artifacts, timing",
-          "Final video exists",
-          "No artifact mutation"
-        ],
-        "verification_steps": [
-          "Run pipeline",
-          "Inspect report"
-        ],
-        "depends_on": [
-          "work_3_validation_layer"
-        ],
-        "forbidden_dependencies": [
-          "projects/pipeline-runner/.aios/request.json"
-        ],
-        "repair_notes": [],
-        "review_required": true,
-        "test_required": true
-      },
-      {
-        "work_id": "work_5_review",
-        "phase_id": "phase_4",
-        "title": "Review pipeline correctness",
-        "role": "reviewer",
-        "kind": "review",
-        "goal": "Ensure architecture compliance.",
-        "scope_summary": "Verify contracts, determinism, and orchestration-only behavior.",
-        "allowed_paths": [
-          "projects/pipeline-runner/**"
-        ],
-        "resolved_inputs": {},
-        "resolved_output_paths": {},
-        "required_artifacts": [
+      "review_required": true,
+      "role": "coder",
+      "scope_summary": "Connect the blackbox runtime to the actual five-stage sequence, resolve logical artifacts between stages, project the final video artifact to runtime root, and write a deterministic pipeline report.",
+      "test_required": true,
+      "title": "Wire fixed stage sequence and artifact resolution",
+      "verification_steps": [
+        "Run integration tests that simulate each stage producing stage_output.json with logical artifacts",
+        "Verify final stage input_json is built only from upstream logical artifacts and project inputs",
+        "Verify missing required artifact logical names cause immediate pipeline failure",
+        "Verify runtime/final_video.mp4 and runtime/pipeline_report.json are produced on successful execution"
+      ],
+      "work_id": "work_2_pipeline_wiring_and_artifact_resolution"
+    },
+    {
+      "acceptance_criteria": [
+        "A full end-to-end runner execution succeeds against the standardized blackbox stages and produces runtime/final_video.mp4",
+        "pipeline_report.json includes all five stages with stage_id, status, and artifacts",
+        "Two identical successful runs produce identical pipeline_report.json content",
+        "Runner verifies final stage outputs and fails when final video artifact is missing or invalid",
+        "README and directly affected tests reflect the blackbox unified interface and final runner behavior"
+      ],
+      "allowed_paths": [
+        "projects/pipeline-runner/src/**",
+        "projects/pipeline-runner/tests/**",
+        "projects/pipeline-runner/package.json",
+        "projects/pipeline-runner/README.md"
+      ],
+      "artifact_expectations": {
+        "final_outputs": [
+          "projects/pipeline-runner/runtime/final_video.mp4",
           "projects/pipeline-runner/runtime/pipeline_report.json"
         ],
-        "artifact_expectations": {},
-        "deliverables": [
-          "reviewer.json"
-        ],
-        "acceptance_criteria": [
-          "No implicit behavior",
-          "No artifact mutation",
-          "Contracts enforced"
-        ],
-        "verification_steps": [
-          "Inspect code and outputs"
-        ],
-        "depends_on": [
-          "work_4_report_and_outputs"
-        ],
-        "forbidden_dependencies": [],
-        "forbidden_paths": [],
-        "repair_notes": [],
-        "review_required": true,
-        "test_required": false
+        "stage_reports": [
+          "projects/pipeline-runner/runtime/stages/ingest/stage_output.json",
+          "projects/pipeline-runner/runtime/stages/transcript/stage_output.json",
+          "projects/pipeline-runner/runtime/stages/subtitle/stage_output.json",
+          "projects/pipeline-runner/runtime/stages/dub_audio/stage_output.json",
+          "projects/pipeline-runner/runtime/stages/final/stage_output.json"
+        ]
       },
-      {
-        "work_id": "work_6_e2e_test",
-        "phase_id": "phase_4",
-        "title": "End-to-end test",
-        "role": "tester",
-        "kind": "test",
-        "goal": "Validate full pipeline determinism.",
-        "scope_summary": "Run full pipeline and verify outputs.",
-        "allowed_paths": [
-          "projects/pipeline-runner/tests/**",
-          "projects/pipeline-runner/runtime/**"
-        ],
-        "resolved_inputs": {
-          "video_path": "test video",
-          "output_dir": "projects/pipeline-runner/runtime/"
+      "deliverables": [
+        "end-to-end runner validation suite",
+        "determinism tests for pipeline_report.json",
+        "final output validation checks",
+        "updated runner documentation for blackbox stage execution"
+      ],
+      "depends_on": [
+        "work_2_pipeline_wiring_and_artifact_resolution"
+      ],
+      "forbidden_dependencies": [
+        "projects/pipeline-runner/.aios/request.json"
+      ],
+      "forbidden_paths": [
+        "projects/video-ingest-standardizer/**",
+        "projects/audio-transcript-transformer/**",
+        "projects/subtitle-video-rebuilder/**",
+        "projects/dubbed-audio-rebuilder/**",
+        "projects/video-final-composer/**"
+      ],
+      "goal": "Fully achieve the original project goal by validating the refactored runner end-to-end, verifying determinism, and documenting the final blackbox orchestration behavior.",
+      "kind": "validation",
+      "phase_id": "phase_3",
+      "repair_notes": [
+        "If end-to-end validation requires modifying sub-projects, that indicates the runner plan or stage assumptions are wrong and should be treated as a planning issue",
+        "If report determinism fails because of runner-added timestamps or unstable fields, that is an implementation failure in this work",
+        "If documentation diverges from actual CLI or artifact behavior, later operator usage will break and the work must not be approved"
+      ],
+      "required_artifacts": [
+        "projects/pipeline-runner/runtime/final_video.mp4",
+        "projects/pipeline-runner/runtime/pipeline_report.json"
+      ],
+      "resolved_inputs": {
+        "end_to_end_project_inputs": {
+          "video_path": "absolute input video path for runner execution",
+          "target_language": "target language string for runner execution"
         },
-        "resolved_output_paths": {
-          "final_video": "projects/pipeline-runner/runtime/stages/final/final_video.mp4"
-        },
-        "required_artifacts": [],
-        "artifact_expectations": {},
-        "deliverables": [
-          "test results"
-        ],
-        "acceptance_criteria": [
-          "Final video exists",
-          "Report exists",
-          "Deterministic outputs"
-        ],
-        "verification_steps": [
-          "Run twice",
-          "Compare outputs"
-        ],
-        "depends_on": [
-          "work_5_review"
-        ],
-        "forbidden_dependencies": [],
-        "forbidden_paths": [],
-        "repair_notes": [],
-        "review_required": false,
-        "test_required": true
-      }
-    ]
-  }
+        "successful_stage_sequence": [
+          "ingest",
+          "transcript",
+          "subtitle",
+          "dub_audio",
+          "final"
+        ]
+      },
+      "resolved_output_paths": {
+        "pipeline_report": "projects/pipeline-runner/runtime/pipeline_report.json",
+        "final_video": "projects/pipeline-runner/runtime/final_video.mp4",
+        "runtime_root": "projects/pipeline-runner/runtime",
+        "readme": "projects/pipeline-runner/README.md"
+      },
+      "review_required": true,
+      "role": "coder",
+      "scope_summary": "Validate the fully wired blackbox runner end-to-end, prove deterministic reporting and final output correctness, and update tests and docs so the project is execution-ready.",
+      "test_required": true,
+      "title": "Validate end-to-end runner and finalize operator-facing behavior",
+      "verification_steps": [
+        "Run the full pipeline-runner end-to-end against the standardized stage sequence",
+        "Run the same successful pipeline twice and compare pipeline_report.json for exact equality",
+        "Verify pipeline_report.json contains five stages with stage_id, status, and artifacts",
+        "Verify the runner fails when final_video_mp4 is missing from the final stage output"
+      ],
+      "work_id": "work_3_end_to_end_validation_and_final_outputs"
+    }
+  ]
+}
