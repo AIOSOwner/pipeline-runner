@@ -1,4 +1,101 @@
 {
-    "project_id": "pipeline-runner",
-    "goal": "Build a fully local deterministic orchestration module that runs the five completed video-language-transformation subprojects as one end-to-end pipeline, passes artifacts between them through explicit contracts, validates each stage boundary, and produces a final pipeline report with downstream-ready outputs."
+  "project_id": "pipeline-runner",
+  "goal": "Build a deterministic orchestration runner that executes a fixed sequence of blackbox video processing stages using a unified stage interface and produces a final composed video with full execution trace.",
+
+  "constraints": [
+    "Runner must treat all sub-projects as blackbox stages",
+    "Runner must not import or rely on internal code of any sub-project",
+    "Runner must invoke stages only via CLI using unified interface",
+    "Each stage must be executed using: node src/index.js --input_json=... --output_dir=...",
+    "Runner must only read stage outputs from stage_output.json",
+    "Runner must not infer or reconstruct artifacts",
+    "Runner must fail immediately if any stage returns status FAILED",
+    "Runner must not mutate stage artifacts",
+    "All execution must be deterministic (no timestamps, no randomness)",
+    "All paths must be explicit and reproducible"
+  ],
+
+  "inputs": {
+    "video_path": {
+      "type": "string",
+      "required": true
+    },
+    "target_language": {
+      "type": "string",
+      "required": true
+    }
+  },
+
+  "outputs": {
+    "required_files": [
+      "runtime/pipeline_report.json",
+      "runtime/final_video.mp4"
+    ]
+  },
+
+  "pipeline_definition": [
+    {
+      "stage_id": "ingest",
+      "project_id": "video-ingest-standardizer",
+      "inputs": {
+        "video_path": "{{inputs.video_path}}"
+      }
+    },
+    {
+      "stage_id": "transcript",
+      "project_id": "audio-transcript-transformer",
+      "inputs": {
+        "audio_path": "{{ingest.artifacts.audio_source_wav}}",
+        "timeline_path": "{{ingest.artifacts.timeline_json}}",
+        "target_language": "{{inputs.target_language}}"
+      }
+    },
+    {
+      "stage_id": "subtitle",
+      "project_id": "subtitle-video-rebuilder",
+      "inputs": {
+        "video_path": "{{inputs.video_path}}",
+        "timeline_path": "{{ingest.artifacts.timeline_json}}",
+        "transcript_path": "{{transcript.artifacts.transcript_json}}",
+        "translated_transcript_path": "{{transcript.artifacts.translated_transcript_json}}"
+      }
+    },
+    {
+      "stage_id": "dub_audio",
+      "project_id": "dubbed-audio-rebuilder",
+      "inputs": {
+        "timeline_path": "{{ingest.artifacts.timeline_json}}",
+        "translated_transcript_path": "{{transcript.artifacts.translated_transcript_json}}"
+      }
+    },
+    {
+      "stage_id": "final",
+      "project_id": "video-final-composer",
+      "inputs": {
+        "video_path": "{{inputs.video_path}}",
+        "timeline_path": "{{ingest.artifacts.timeline_json}}",
+        "dubbed_audio_path": "{{dub_audio.artifacts.full_audio_wav}}"
+      }
+    }
+  ],
+
+  "execution_rules": [
+    "Stages must execute strictly in defined order",
+    "Each stage must have its own isolated output directory",
+    "Runner must persist input_json for each stage",
+    "Runner must persist stage_output.json for each stage",
+    "Runner must build a pipeline_report.json summarizing all stages",
+    "Runner must include stage execution status, artifacts, and timing in report",
+    "Runner must not auto-generate missing artifacts",
+    "If required artifact is missing → pipeline must fail"
+  ],
+
+  "reporting_requirements": {
+    "pipeline_report.json": [
+      "stages[]",
+      "each stage must include: stage_id, status, artifacts",
+      "final_video_path",
+      "overall_status"
+    ]
   }
+}
