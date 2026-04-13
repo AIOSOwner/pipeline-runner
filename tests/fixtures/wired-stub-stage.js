@@ -43,7 +43,12 @@ if (stageId === 'ingest') {
   touch('full_audio.wav', 'wav');
   artifacts.full_audio_wav = 'full_audio.wav';
 } else if (stageId === 'final') {
-  touch('final_video.mp4', 'mp4');
+  const mp4 = Buffer.alloc(12);
+  mp4.writeUInt32BE(12, 0);
+  mp4.write('ftyp', 4);
+  mp4.write('isom', 8);
+  fs.mkdirSync(outputDir, { recursive: true });
+  fs.writeFileSync(path.join(outputDir, 'final_video.mp4'), mp4);
   writeJson('composition_report.json', {});
   writeJson('manifest.json', {});
   artifacts.final_video_mp4 = 'final_video.mp4';

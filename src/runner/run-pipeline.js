@@ -13,6 +13,7 @@ const {
   safeResolveUnder,
   resolveArtifactMap,
 } = require('./pipeline-wiring');
+const { validateProjectedFinalVideoMp4 } = require('./final-video-validate');
 
 function isStageSucceeded(status) {
   const u = String(status).toUpperCase();
@@ -192,6 +193,25 @@ function runWiredPipeline(options) {
 
     if (stageId === 'final') {
       projectFinalVideoToRuntimeRoot(runtimeRoot, stageDir, r.stageOutput.artifacts.final_video_mp4);
+      const fv = validateProjectedFinalVideoMp4(runtimeRoot);
+      if (!fv.ok) {
+        trace.pop();
+        trace.push({
+          stage_id: 'final',
+          status: 'FAILED',
+          artifacts: relArtifacts,
+          error: fv.error,
+        });
+        const reportPath = writePipelineReport(runtimeRoot, trace, null);
+        return {
+          ok: false,
+          executionModel: EXECUTION_MODEL,
+          trace: trace.map((t) => ({ id: t.stage_id, ok: t.status === 'COMPLETED' })),
+          failedStageId: 'final',
+          stoppedAt: i,
+          pipeline_report_path: reportPath,
+        };
+      }
     }
   }
 
