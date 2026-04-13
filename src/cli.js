@@ -2,7 +2,6 @@
 
 const fs = require('node:fs');
 const { runPipeline } = require('./runner/run-pipeline');
-const { getDefaultStages } = require('./runner/default-stages');
 
 function parseArgs(argv) {
   let videoPath = null;
@@ -35,18 +34,10 @@ function main(argv = process.argv) {
     return 2;
   }
 
-  const stages = getDefaultStages().map((s) => ({
-    ...s,
-    input: {
-      ...s.input,
-      video_path: videoPath,
-      target_language: targetLanguage,
-    },
-  }));
-
   const result = runPipeline({
     runtimeRoot: outputDir,
-    stages,
+    videoPath,
+    targetLanguage,
   });
 
   if (!result.ok) {

@@ -2,7 +2,8 @@
 
 const { invokeStage, EXECUTION_MODEL } = require('./runner/invoke-stage');
 const { runBlackboxStage, getStageRuntimeDir, parseCliArg } = require('./runner/stage-runtime');
-const { runPipeline } = require('./runner/run-pipeline');
+const { runPipeline, runWiredPipeline, runExplicitStagesPipeline } = require('./runner/run-pipeline');
+const pipelineWiring = require('./runner/pipeline-wiring');
 const { getDefaultStages } = require('./runner/default-stages');
 const { buildPipelineContext, resolveStagePaths } = require('./runner/pipeline-context');
 const workspace = require('./workspace');
@@ -16,6 +17,9 @@ module.exports = {
   parseCliArg,
   EXECUTION_MODEL,
   runPipeline,
+  runWiredPipeline,
+  runExplicitStagesPipeline,
+  pipelineWiring,
   getDefaultStages,
   buildPipelineContext,
   resolveStagePaths,
