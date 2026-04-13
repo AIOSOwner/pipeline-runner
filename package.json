@@ -1,0 +1,17 @@
+{
+  "name": "pipeline-runner",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Deterministic sequential pipeline orchestration (orchestrate and validate only).",
+  "type": "commonjs",
+  "main": "src/index.js",
+  "bin": {
+    "pipeline-runner": "./src/cli.js"
+  },
+  "scripts": {
+    "test": "node --test tests/run-pipeline.test.js tests/cli.test.js tests/pipeline-context.test.js tests/workspace.test.js tests/validation.test.js tests/report.test.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
