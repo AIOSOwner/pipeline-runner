@@ -1,0 +1,42 @@
+{
+  "work_id": "work_4_report_and_outputs",
+  "phase_id": "phase_4",
+  "title": "Generate pipeline report and outputs",
+  "role": "coder",
+  "kind": "implementation",
+  "goal": "Produce final outputs and pipeline report.",
+  "scope_summary": "Generate final_video and pipeline_report.json.",
+  "allowed_paths": [
+    "projects/pipeline-runner/src/**",
+    "projects/pipeline-runner/runtime/**",
+    "projects/pipeline-runner/tests/**"
+  ],
+  "resolved_inputs": {},
+  "resolved_output_paths": {
+    "final_video": "projects/pipeline-runner/runtime/stages/final/final_video.mp4",
+    "report": "projects/pipeline-runner/runtime/pipeline_report.json"
+  },
+  "required_artifacts": [],
+  "artifact_expectations": {},
+  "deliverables": [
+    "pipeline_report.json"
+  ],
+  "acceptance_criteria": [
+    "Report contains stages, artifacts, timing",
+    "Final video exists",
+    "No artifact mutation"
+  ],
+  "verification_steps": [
+    "Run pipeline",
+    "Inspect report"
+  ],
+  "depends_on": [
+    "work_3_validation_layer"
+  ],
+  "forbidden_dependencies": [
+    "projects/pipeline-runner/.aios/request.json"
+  ],
+  "repair_notes": [],
+  "review_required": true,
+  "test_required": true
+}

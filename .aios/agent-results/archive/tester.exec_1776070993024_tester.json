@@ -1,0 +1,18 @@
+{
+  "execution_id": "exec_1776070993024_tester",
+  "project_id": "pipeline-runner",
+  "reasons": [
+    "Acceptance criteria 'Each stage has isolated directory' and verification step 'Inspect workspace layout' passed: test suite includes workspace materialization checks and a direct CLI behavioral run validated ingest/transcript/dubbing/subtitle/final stage directories.",
+    "Acceptance criteria 'No artifact inferred' and 'All paths deterministic' passed: tests validated deterministic contracts artifact mapping with explicit relative paths; direct behavioral run revalidated expected contracts paths.",
+    "Acceptance criteria 'video_path represented as reference artifact' passed: ingest stage writes input_video_ref.json and contracts map video_reference to stages/ingest/input_video_ref.json.",
+    "Artifact contract rules passed: no raw special-case path handling observed; string reference is materialized as artifact and consumed via explicit artifact mapping in runtime behavior."
+  ],
+  "role": "tester",
+  "run_commands": [
+    "cd projects/pipeline-runner && npm test",
+    "cd projects/pipeline-runner && node -e \"const fs=require('fs');const os=require('os');const path=require('path');const {spawnSync}=require('child_process');const dir=fs.mkdtempSync(path.join(os.tmpdir(),'pr-tester-'));const video=path.join(dir,'in.mp4');const out=path.join(dir,'runtime');fs.writeFileSync(video,Buffer.from([1,2,3]));const cli=path.join(process.cwd(),'src','cli.js');const r=spawnSync(process.execPath,[cli,'--video',video,'--output-dir',out],{encoding:'utf8'});if(r.status!==0){console.error('cli_failed');process.exit(2);}const stages=['ingest','transcript','dubbing','subtitle','final'];for(const s of stages){if(!fs.existsSync(path.join(out,'stages',s))){console.error('missing_stage',s);process.exit(3);}}const contracts=JSON.parse(fs.readFileSync(path.join(out,'contracts.json'),'utf8'));const expected={video_reference:'stages/ingest/input_video_ref.json',audio:'stages/ingest/audio/source_full.wav',timeline:'stages/ingest/timeline.json',translated_transcript:'stages/transcript/translated_transcript.json',dubbed_audio:'stages/dubbing/dubbed_audio/full.wav',subtitle:'stages/subtitle/subtitles_translated.srt'};for(const [k,v] of Object.entries(expected)){if(!contracts.artifacts[k]||contracts.artifacts[k].relative_path!==v){console.error('bad_artifact',k);process.exit(4);}}console.log('ok');\""
+  ],
+  "status": "COMPLETED",
+  "summary": "Validated work_2_workspace_and_contract_mapping using both the project test suite and an additional direct runtime behavioral check. All validations passed: stage-isolated workspace directories are created deterministically, contracts.json is generated with explicit artifact mapping, and video_path is represented via the video_reference artifact.",
+  "work_id": "work_2_workspace_and_contract_mapping"
+}

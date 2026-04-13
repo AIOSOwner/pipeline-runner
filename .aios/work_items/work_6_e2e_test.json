@@ -1,0 +1,43 @@
+{
+  "work_id": "work_6_e2e_test",
+  "phase_id": "phase_4",
+  "title": "End-to-end test",
+  "role": "tester",
+  "kind": "test",
+  "goal": "Validate full pipeline determinism.",
+  "scope_summary": "Run full pipeline and verify outputs.",
+  "allowed_paths": [
+    "projects/pipeline-runner/src/**",
+    "projects/pipeline-runner/tests/**",
+    "projects/pipeline-runner/runtime/**"
+  ],
+  "resolved_inputs": {
+    "video_path": "test video",
+    "output_dir": "projects/pipeline-runner/runtime/"
+  },
+  "resolved_output_paths": {
+    "final_video": "projects/pipeline-runner/runtime/stages/final/final_video.mp4"
+  },
+  "required_artifacts": [],
+  "artifact_expectations": {},
+  "deliverables": [
+    "test results"
+  ],
+  "acceptance_criteria": [
+    "Final video exists",
+    "Report exists",
+    "Deterministic outputs"
+  ],
+  "verification_steps": [
+    "Run twice",
+    "Compare outputs"
+  ],
+  "depends_on": [
+    "work_5_fix_report_determinism"
+  ],
+  "forbidden_dependencies": [],
+  "forbidden_paths": [],
+  "repair_notes": [],
+  "review_required": false,
+  "test_required": true
+}

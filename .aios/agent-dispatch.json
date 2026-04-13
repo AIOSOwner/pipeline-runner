@@ -1,11 +1,11 @@
 {
   "project_id": "pipeline-runner",
-  "role": "planner",
-  "execution_id": "exec_1776067165201_planner",
-  "input_file": "projects/pipeline-runner/.aios/planner-input.json",
-  "prompt_file": "projects/pipeline-runner/.aios/planner-prompt.txt",
-  "result_file": "projects/pipeline-runner/.aios/agent-results/planner.json",
+  "role": "coder",
+  "execution_id": "exec_1776075006090_coder",
+  "input_file": null,
+  "prompt_file": "projects/pipeline-runner/.aios/coder-prompt.txt",
+  "result_file": "projects/pipeline-runner/.aios/agent-results/coder.json",
   "archived_result_file": null,
   "status": "WAITING",
-  "updated_at": "2026-04-13T08:00:21.881Z"
+  "updated_at": "2026-04-13T10:10:16.599Z"
 }

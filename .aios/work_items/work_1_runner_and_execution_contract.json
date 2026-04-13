@@ -1,0 +1,61 @@
+{
+  "work_id": "work_1_runner_and_execution_contract",
+  "phase_id": "phase_1",
+  "title": "Implement pipeline runner and single execution model",
+  "role": "coder",
+  "kind": "implementation",
+  "goal": "Create deterministic pipeline runner with a single explicit stage execution model.",
+  "scope_summary": "Implement runPipeline, CLI entrypoint, and enforce a single consistent stage invocation model.",
+  "allowed_paths": [
+    "projects/pipeline-runner/src/**",
+    "projects/pipeline-runner/tests/**",
+    "projects/pipeline-runner/package.json",
+    "projects/pipeline-runner/README.md"
+  ],
+  "forbidden_paths": [
+    "projects/video-*/**"
+  ],
+  "resolved_inputs": {
+    "video_path": "CLI argument",
+    "output_dir": "CLI argument"
+  },
+  "resolved_output_paths": {
+    "workspace_root": "projects/pipeline-runner/runtime/"
+  },
+  "required_artifacts": [],
+  "artifact_expectations": {},
+  "deliverables": [
+    "runPipeline function",
+    "CLI entrypoint",
+    "stage invocation wrapper"
+  ],
+  "acceptance_criteria": [
+    "Single execution model used for all stages",
+    "Stages invoked deterministically",
+    "Fail-fast enforced",
+    "No implicit behavior"
+  ],
+  "verification_steps": [
+    "Run pipeline",
+    "Verify execution order",
+    "Verify failure stops pipeline"
+  ],
+  "depends_on": [],
+  "forbidden_dependencies": [
+    "projects/pipeline-runner/.aios/request.json"
+  ],
+  "repair_notes": [
+    "If multiple execution styles exist → FAIL",
+    "If CLI behavior differs between stages → FAIL"
+  ],
+  "review_required": true,
+  "test_required": true,
+  "stage_execution_rules": [
+    "Pipeline runner must use one single documented execution model for all stage invocations.",
+    "The chosen execution model must be implemented consistently in code, tests, and docs.",
+    "Runner must not support parallel invocation models.",
+    "Each stage must receive explicit input paths.",
+    "Runner must pass explicit output_dir per stage.",
+    "Stage outputs must be resolved from output_dir only."
+  ]
+}

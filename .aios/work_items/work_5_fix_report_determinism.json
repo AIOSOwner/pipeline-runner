@@ -1,0 +1,34 @@
+{
+  "work_id": "work_5_fix_report_determinism",
+  "phase_id": "phase_4",
+  "title": "Fix pipeline report determinism",
+  "role": "coder",
+  "kind": "implementation",
+  "goal": "Ensure pipeline_report.json is deterministic across identical runs.",
+  "scope_summary": "Remove nondeterministic fields and enforce stable serialization.",
+  "allowed_paths": [
+    "projects/pipeline-runner/src/**",
+    "projects/pipeline-runner/tests/**"
+  ],
+  "resolved_inputs": {},
+  "resolved_output_paths": {},
+  "required_artifacts": [],
+  "artifact_expectations": {},
+  "deliverables": [
+    "deterministic pipeline_report.json"
+  ],
+  "acceptance_criteria": [
+    "pipeline_report.json hash identical across identical runs",
+    "no timestamp or runtime-dependent values",
+    "stable JSON key ordering"
+  ],
+  "verification_steps": [
+    "run pipeline twice",
+    "compare report hashes"
+  ],
+  "depends_on": [
+    "work_4_report_and_outputs"
+  ],
+  "review_required": true,
+  "test_required": true
+}

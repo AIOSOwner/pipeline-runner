@@ -1,0 +1,242 @@
+ROLE: REVIEWER
+TASK: Review coder output using git diff and provided evidence
+READ:
+projects/pipeline-runner/.aios/execution.json
+RULES:
+- output json only
+- output must exactly match the specified output format
+- output JSON must include role="reviewer" at top-level
+- output JSON must include project_id, work_id, and execution_id
+- output JSON execution_id must equal current_reviewer_execution_id
+- status must be one of: APPROVED, REJECTED
+- review only the current work item
+- base your review primarily on git diff and provided context
+- do not assume unseen code is correct
+- if implementation violates scope, contract, or acceptance criteria → REJECTED
+- if the implementation may be correct but the provided diff/context is insufficient for reliable review → REJECTED
+- when rejecting due to insufficient evidence, you MUST include requested_evidence
+- requested_evidence must be a list of specific items needed to complete the review
+- examples: full file path, artifact sample, test output
+- do not invent missing context
+- do not approve based only on summary
+- reasons must clearly distinguish between real failure vs insufficient evidence
+CONTEXT:
+{
+  "coder_output": {
+    "execution_id": "exec_1776071799548_coder",
+    "project_id": "pipeline-runner",
+    "role": "coder",
+    "run_commands": [
+      "cd projects/pipeline-runner && npm test 2>&1"
+    ],
+    "status": "COMPLETED",
+    "summary": "Fixed rejected work_4 behavior by removing runner-level final video synthesis. Updated ensureFinalVideoMp4 to strictly verify presence of final_video artifact and fail when missing, preserving orchestration-only constraints and preventing artifact mutation by the runner. Kept deterministic pipeline_report generation and failure reporting paths, and updated tests to reflect the corrected contract: default stages/CLI now fail when final_video is absent, while successful pipelines must produce final_video via stages. Report tests now validate existence-only verification and no mutation semantics. Full test suite passes.",
+    "work_id": "work_4_report_and_outputs"
+  },
+  "current_reviewer_execution_id": "exec_1776072144094_reviewer",
+  "execution": {
+    "constraints": [],
+    "created_at": "2026-04-13T09:22:24.094Z",
+    "current_work_id": "work_5_review",
+    "execution_id": "exec_1776072144094_reviewer",
+    "goal": "Build a fully local deterministic orchestration module that runs the five completed video-language-transformation subprojects as one end-to-end pipeline, passes artifacts between them through explicit contracts, validates each stage boundary, and produces a final pipeline report with downstream-ready outputs.",
+    "issue": null,
+    "issue_id": null,
+    "mode": "EXECUTE",
+    "output_file": ".aios/agent-results/reviewer.json",
+    "plan": {
+      "constraints": [
+        "Fully local execution only",
+        "Deterministic outputs for identical inputs",
+        "Strict sequential execution only",
+        "Fail-fast on any stage error",
+        "No implicit artifact discovery",
+        "All paths must be explicit and stable",
+        "Runner must not modify artifacts",
+        "Runner must only orchestrate and validate",
+        "All processing logic belongs to subprojects"
+      ],
+      "execution_order": [
+        "work_1_runner_and_execution_contract",
+        "work_2_workspace_and_contract_mapping",
+        "work_3_validation_layer",
+        "work_4_report_and_outputs",
+        "work_5_review",
+        "work_6_e2e_test"
+      ],
+      "goal": "Build a fully local deterministic orchestration module that runs the five completed video-language-transformation subprojects as one end-to-end pipeline, passes artifacts between them through explicit contracts, validates each stage boundary, and produces a final pipeline report with downstream-ready outputs.",
+      "plan_id": "pipeline_runner_plan_v3_final",
+      "project_id": "pipeline-runner",
+      "summary": "Deterministic sequential pipeline runner with strict execution contract, isolated workspace, explicit artifact mapping, strong validation, and machine-readable reporting. Runner orchestrates and validates only, never modifies artifacts."
+    },
+    "plan_path": ".aios/plan.json",
+    "project_id": "pipeline-runner",
+    "request": {
+      "goal": "Build a fully local deterministic orchestration module that runs the five completed video-language-transformation subprojects as one end-to-end pipeline, passes artifacts between them through explicit contracts, validates each stage boundary, and produces a final pipeline report with downstream-ready outputs.",
+      "project_id": "pipeline-runner"
+    },
+    "request_path": ".aios/request.json",
+    "role": "reviewer",
+    "state": {
+      "blocked_issue_id": null,
+      "completed_roles": [
+        "planner",
+        "coder",
+        "reviewer",
+        "tester"
+      ],
+      "completed_work_items": [
+        "work_1_runner_and_execution_contract",
+        "work_2_workspace_and_contract_mapping",
+        "work_3_validation_layer",
+        "work_4_report_and_outputs"
+      ],
+      "current_role": "reviewer",
+      "current_work_id": "work_5_review",
+      "force_review": true,
+      "last_execution_id": "exec_1776072081093_tester",
+      "open_issue_id": null,
+      "phase": "REVIEW",
+      "project_id": "pipeline-runner",
+      "review_base_commit": "12b3e4ca896cbbe355c0b011842b9d8319430465",
+      "review_work_id": "work_4_report_and_outputs",
+      "status": "READY",
+      "updated_at": "2026-04-13T07:51:54.462Z"
+    },
+    "success_criteria": [],
+    "work_id": "work_5_review"
+  },
+  "git": {
+    "changed_files": [],
+    "diff": "diff --git a/.aios/agent-dispatch.json b/.aios/agent-dispatch.json\nindex 23d2fc0..a33d43b 100644\n--- a/.aios/agent-dispatch.json\n+++ b/.aios/agent-dispatch.json\n@@ -1,11 +1,11 @@\n {\n   \"project_id\": \"pipeline-runner\",\n-  \"role\": \"planner\",\n-  \"execution_id\": \"exec_1776067165201_planner\",\n-  \"input_file\": \"projects/pipeline-runner/.aios/planner-input.json\",\n-  \"prompt_file\": \"projects/pipeline-runner/.aios/planner-prompt.txt\",\n-  \"result_file\": \"projects/pipeline-runner/.aios/agent-results/planner.json\",\n+  \"role\": \"reviewer\",\n+  \"execution_id\": \"exec_1776072144094_reviewer\",\n+  \"input_file\": \"projects/pipeline-runner/.aios/reviewer-input.json\",\n+  \"prompt_file\": \"projects/pipeline-runner/.aios/reviewer-prompt.txt\",\n+  \"result_file\": \"projects/pipeline-runner/.aios/agent-results/reviewer.json\",\n   \"archived_result_file\": null,\n   \"status\": \"WAITING\",\n-  \"updated_at\": \"2026-04-13T08:00:21.881Z\"\n+  \"updated_at\": \"2026-04-13T09:36:00.661Z\"\n }\ndiff --git a/.aios/agent-results/planner.json b/.aios/agent-results/planner.json\ndeleted file mode 100644\nindex db02afb..0000000\n--- a/.aios/agent-results/planner.json\n+++ /dev/null\n@@ -1,334 +0,0 @@\n-{\n-    \"execution_id\": \"exec_1776067165201_planner\",\n-    \"project_id\": \"pipeline-runner\",\n-    \"role\": \"planner\",\n-    \"plan\": {\n-      \"plan_id\": \"pipeline_runner_plan_v3_final\",\n-      \"project_id\": \"pipeline-runner\",\n-      \"goal\": \"Build a fully local deterministic orchestration module that runs the five completed video-language-transformation subprojects as one end-to-end pipeline, passes artifacts between them through explicit contracts, validates each stage boundary, and produces a final pipeline report with downstream-ready outputs.\",\n-      \"summary\": \"Deterministic sequential pipeline runner with strict execution contract, isolated workspace, explicit artifact mapping, strong validation, and machine-readable reporting. Runner orchestrates and validates only, never modifies artifacts.\",\n-      \"constraints\": [\n-        \"Fully local execution only\",\n-        \"Deterministic outputs for identical inputs\",\n-        \"Strict sequential execution only\",\n-        \"Fail-fast on any stage error\",\n-        \"No implicit artifact discovery\",\n-        \"All paths must be explicit and stable\",\n-        \"Runner must not modify artifacts\",\n-        \"Runner must only orchestrate and validate\",\n-        \"All processing logic belongs to subprojects\"\n-      ],\n-      \"execution_order\": [\n-        \"work_1_runner_and_execution_contract\",\n-        \"work_2_workspace_and_contract_mapping\",\n-        \"work_3_validation_layer\",\n-        \"work_4_report_and_outputs\",\n-        \"work_5_review\",\n-        \"work_6_e2e_test\"\n-      ]\n-    },\n-    \"work_items\": [\n-      {\n-        \"work_id\": \"work_1_runner_and_execution_contract\",\n-        \"phase_id\": \"phase_1\",\n-        \"title\": \"Implement pipeline runner and single execution model\",\n-        \"role\": \"coder\",\n-        \"kind\": \"implementation\",\n-        \"goal\": \"Create deterministic pipeline runner with a single explicit stage execution model.\",\n-        \"scope_summary\": \"Implement runPipeline, CLI entrypoint, and enforce a single consistent stage invocation model.\",\n-        \"allowed_paths\": [\n-          \"projects/pipeline-runner/src/**\",\n-          \"projects/pipeline-runner/tests/**\",\n-          \"projects/pipeline-runner/package.json\",\n-          \"projects/pipeline-runner/README.md\"\n-        ],\n-        \"forbidden_paths\": [\n-          \"projects/video-*/**\"\n-        ],\n-        \"resolved_inputs\": {\n-          \"video_path\": \"CLI argument\",\n-          \"output_dir\": \"CLI argument\"\n-        },\n-        \"resolved_output_paths\": {\n-          \"workspace_root\": \"projects/pipeline-runner/runtime/\"\n-        },\n-        \"required_artifacts\": [],\n-        \"artifact_expectations\": {},\n-        \"deliverables\": [\n-          \"runPipeline function\",\n-          \"CLI entrypoint\",\n-          \"stage invocation wrapper\"\n-        ],\n-        \"acceptance_criteria\": [\n-          \"Single execution model used for all stages\",\n-          \"Stages invoked deterministically\",\n-          \"Fail-fast enforced\",\n-          \"No implicit behavior\"\n-        ],\n-        \"verification_steps\": [\n-          \"Run pipeline\",\n-          \"Verify execution order\",\n-          \"Verify failure stops pipeline\"\n-        ],\n-        \"depends_on\": [],\n-        \"forbidden_dependencies\": [\n-          \"projects/pipeline-runner/.aios/request.json\"\n-        ],\n-        \"repair_notes\": [\n-          \"If multiple execution styles exist → FAIL\",\n-          \"If CLI behavior differs between stages → FAIL\"\n-        ],\n-        \"review_required\": true,\n-        \"test_required\": true,\n-        \"stage_execution_rules\": [\n-          \"Pipeline runner must use one single documented execution model for all stage invocations.\",\n-          \"The chosen execution model must be implemented consistently in code, tests, and docs.\",\n-          \"Runner must not support parallel invocation models.\",\n-          \"Each stage must receive explicit input paths.\",\n-          \"Runner must pass explicit output_dir per stage.\",\n-          \"Stage outputs must be resolved from output_dir only.\"\n-        ]\n-      },\n-      {\n-        \"work_id\": \"work_2_workspace_and_contract_mapping\",\n-        \"phase_id\": \"phase_2\",\n-        \"title\": \"Implement workspace and artifact contracts\",\n-        \"role\": \"coder\",\n-        \"kind\": \"integration\",\n-        \"goal\": \"Create isolated workspace and explicit artifact mapping across stages.\",\n-        \"scope_summary\": \"Define stage directories and map artifacts strictly between stages.\",\n-        \"allowed_paths\": [\n-          \"projects/pipeline-runner/src/**\",\n-          \"projects/pipeline-runner/tests/**\"\n-        ],\n-        \"resolved_inputs\": {},\n-        \"resolved_output_paths\": {\n-          \"ingest\": \"projects/pipeline-runner/runtime/stages/ingest/\",\n-          \"transcript\": \"projects/pipeline-runner/runtime/stages/transcript/\",\n-          \"dubbing\": \"projects/pipeline-runner/runtime/stages/dubbing/\",\n-          \"subtitle\": \"projects/pipeline-runner/runtime/stages/subtitle/\",\n-          \"final\": \"projects/pipeline-runner/runtime/stages/final/\",\n-          \"contracts\": \"projects/pipeline-runner/runtime/contracts.json\"\n-        },\n-        \"required_artifacts\": [],\n-        \"artifact_expectations\": {\n-          \"video_reference\": \"projects/pipeline-runner/runtime/stages/ingest/input_video_ref.json\",\n-          \"audio\": \"runtime/stages/ingest/audio/source_full.wav\",\n-          \"timeline\": \"runtime/stages/ingest/timeline.json\",\n-          \"translated_transcript\": \"runtime/stages/transcript/translated_transcript.json\",\n-          \"dubbed_audio\": \"runtime/stages/dubbing/dubbed_audio/full.wav\",\n-          \"subtitle\": \"runtime/stages/subtitle/subtitles_translated.srt\"\n-        },\n-        \"deliverables\": [\n-          \"workspace structure\",\n-          \"contracts.json\",\n-          \"artifact mapping logic\"\n-        ],\n-        \"acceptance_criteria\": [\n-          \"Each stage has isolated directory\",\n-          \"No artifact inferred\",\n-          \"video_path represented as reference artifact\",\n-          \"All paths deterministic\"\n-        ],\n-        \"verification_steps\": [\n-          \"Inspect workspace layout\",\n-          \"Inspect contracts.json\"\n-        ],\n-        \"depends_on\": [\n-          \"work_1_runner_and_execution_contract\"\n-        ],\n-        \"forbidden_dependencies\": [\n-          \"projects/pipeline-runner/.aios/request.json\"\n-        ],\n-        \"repair_notes\": [\n-          \"If raw string path used instead of reference artifact → FAIL\",\n-          \"If any stage reads outside its directory → FAIL\"\n-        ],\n-        \"review_required\": true,\n-        \"test_required\": true,\n-        \"workspace_rules\": [\n-          \"Each stage must have isolated output_dir\",\n-          \"runtime/stages/ingest/\",\n-          \"runtime/stages/transcript/\",\n-          \"runtime/stages/dubbing/\",\n-          \"runtime/stages/subtitle/\",\n-          \"runtime/stages/final/\"\n-        ],\n-        \"artifact_contract_rules\": [\n-          \"String references must be materialized as artifacts\",\n-          \"No special-case raw path handling\"\n-        ]\n-      },\n-      {\n-        \"work_id\": \"work_3_validation_layer\",\n-        \"phase_id\": \"phase_3\",\n-        \"title\": \"Implement strict validation\",\n-        \"role\": \"coder\",\n-        \"kind\": \"validation\",\n-        \"goal\": \"Validate artifacts and enforce cross-stage consistency.\",\n-        \"scope_summary\": \"Validate JSON, audio duration, timeline consistency, and final video composition.\",\n-        \"allowed_paths\": [\n-          \"projects/pipeline-runner/src/**\",\n-          \"projects/pipeline-runner/tests/**\"\n-        ],\n-        \"resolved_inputs\": {},\n-        \"resolved_output_paths\": {\n-          \"validation_report\": \"projects/pipeline-runner/runtime/validation_report.json\"\n-        },\n-        \"required_artifacts\": [],\n-        \"artifact_expectations\": {},\n-        \"deliverables\": [\n-          \"validation module\",\n-          \"validation_report.json\"\n-        ],\n-        \"acceptance_criteria\": [\n-          \"Dubbed audio duration equals timeline\",\n-          \"Segment count preserved\",\n-          \"Final video has one audio stream\",\n-          \"Fail on any violation\"\n-        ],\n-        \"verification_steps\": [\n-          \"Inject invalid data\",\n-          \"Verify pipeline fails\"\n-        ],\n-        \"depends_on\": [\n-          \"work_2_workspace_and_contract_mapping\"\n-        ],\n-        \"forbidden_dependencies\": [\n-          \"projects/pipeline-runner/.aios/request.json\"\n-        ],\n-        \"repair_notes\": [\n-          \"If validation allows mismatch → FAIL\"\n-        ],\n-        \"review_required\": true,\n-        \"test_required\": true,\n-        \"validation_rules\": [\n-          \"Dubbed audio duration must equal timeline end\",\n-          \"translated_transcript.json must preserve segment count\",\n-          \"final video must contain exactly one audio stream\",\n-          \"timeline consistency must be enforced\"\n-        ]\n-      },\n-      {\n-        \"work_id\": \"work_4_report_and_outputs\",\n-        \"phase_id\": \"phase_4\",\n-        \"title\": \"Generate pipeline report and outputs\",\n-        \"role\": \"coder\",\n-        \"kind\": \"implementation\",\n-        \"goal\": \"Produce final outputs and pipeline report.\",\n-        \"scope_summary\": \"Generate final_video and pipeline_report.json.\",\n-        \"allowed_paths\": [\n-          \"projects/pipeline-runner/src/**\",\n-          \"projects/pipeline-runner/runtime/**\",\n-          \"projects/pipeline-runner/tests/**\"\n-        ],\n-        \"resolved_inputs\": {},\n-        \"resolved_output_paths\": {\n-          \"final_video\": \"projects/pipeline-runner/runtime/stages/final/final_video.mp4\",\n-          \"report\": \"projects/pipeline-runner/runtime/pipeline_report.json\"\n-        },\n-        \"required_artifacts\": [],\n-        \"artifact_expectations\": {},\n-        \"deliverables\": [\n-          \"pipeline_report.json\"\n-        ],\n-        \"acceptance_criteria\": [\n-          \"Report contains stages, artifacts, timing\",\n-          \"Final video exists\",\n-          \"No artifact mutation\"\n-        ],\n-        \"verification_steps\": [\n-          \"Run pipeline\",\n-          \"Inspect report\"\n-        ],\n-        \"depends_on\": [\n-          \"work_3_validation_layer\"\n-        ],\n-        \"forbidden_dependencies\": [\n-          \"projects/pipeline-runner/.aios/request.json\"\n-        ],\n-        \"repair_notes\": [],\n-        \"review_required\": true,\n-        \"test_required\": true\n-      },\n-      {\n-        \"work_id\": \"work_5_review\",\n-        \"phase_id\": \"phase_4\",\n-        \"title\": \"Review pipeline correctness\",\n-        \"role\": \"reviewer\",\n-        \"kind\": \"review\",\n-        \"goal\": \"Ensure architecture compliance.\",\n-        \"scope_summary\": \"Verify contracts, determinism, and orchestration-only behavior.\",\n-        \"allowed_paths\": [\n-          \"projects/pipeline-runner/**\"\n-        ],\n-        \"resolved_inputs\": {},\n-        \"resolved_output_paths\": {},\n-        \"required_artifacts\": [\n-          \"projects/pipeline-runner/runtime/pipeline_report.json\"\n-        ],\n-        \"artifact_expectations\": {},\n-        \"deliverables\": [\n-          \"reviewer.json\"\n-        ],\n-        \"acceptance_criteria\": [\n-          \"No implicit behavior\",\n-          \"No artifact mutation\",\n-          \"Contracts enforced\"\n-        ],\n-        \"verification_steps\": [\n-          \"Inspect code and outputs\"\n-        ],\n-        \"depends_on\": [\n-          \"work_4_report_and_outputs\"\n-        ],\n-        \"forbidden_dependencies\": [],\n-        \"forbidden_paths\": [],\n-        \"repair_notes\": [],\n-        \"review_required\": true,\n-        \"test_required\": false\n-      },\n-      {\n-        \"work_id\": \"work_6_e2e_test\",\n-        \"phase_id\": \"phase_4\",\n-        \"title\": \"End-to-end test\",\n-        \"role\": \"tester\",\n-        \"kind\": \"test\",\n-        \"goal\": \"Validate full pipeline determinism.\",\n-        \"scope_summary\": \"Run full pipeline and verify outputs.\",\n-        \"allowed_paths\": [\n-          \"projects/pipeline-runner/tests/**\",\n-          \"projects/pipeline-runner/runtime/**\"\n-        ],\n-        \"resolved_inputs\": {\n-          \"video_path\": \"test video\",\n-          \"output_dir\": \"projects/pipeline-runner/runtime/\"\n-        },\n-        \"resolved_output_paths\": {\n-          \"final_video\": \"projects/pipeline-runner/runtime/stages/final/final_video.mp4\"\n-        },\n-        \"required_artifacts\": [],\n-        \"artifact_expectations\": {},\n-        \"deliverables\": [\n-          \"test results\"\n-        ],\n-        \"acceptance_criteria\": [\n-          \"Final video exists\",\n-          \"Report exists\",\n-          \"Deterministic outputs\"\n-        ],\n-        \"verification_steps\": [\n-          \"Run twice\",\n-          \"Compare outputs\"\n-        ],\n-        \"depends_on\": [\n-          \"work_5_review\"\n-        ],\n-        \"forbidden_dependencies\": [],\n-        \"forbidden_paths\": [],\n-        \"repair_notes\": [],\n-        \"review_required\": false,\n-        \"test_required\": true\n-      }\n-    ]\n-  }\n\\ No newline at end of file\ndiff --git a/.aios/execution.json b/.aios/execution.json\nindex 114bf01..20b1ee5 100644\n--- a/.aios/execution.json\n+++ b/.aios/execution.json\n@@ -1,36 +1,72 @@\n {\n-  \"execution_id\": \"exec_1776067165201_planner\",\n+  \"execution_id\": \"exec_1776072144094_reviewer\",\n   \"project_id\": \"pipeline-runner\",\n-  \"role\": \"planner\",\n+  \"role\": \"reviewer\",\n   \"mode\": \"EXECUTE\",\n   \"goal\": \"Build a fully local deterministic orchestration module that runs the five completed video-language-transformation subprojects as one end-to-end pipeline, passes artifacts between them through explicit contracts, validates each stage boundary, and produces a final pipeline report with downstream-ready outputs.\",\n   \"constraints\": [],\n   \"success_criteria\": [],\n-  \"current_work_id\": null,\n-  \"work_id\": null,\n+  \"current_work_id\": \"work_5_review\",\n+  \"work_id\": \"work_5_review\",\n   \"issue_id\": null,\n   \"request_path\": \".aios/request.json\",\n-  \"plan_path\": null,\n-  \"created_at\": \"2026-04-13T07:59:25.201Z\",\n-  \"output_file\": \".aios/agent-results/planner.json\",\n+  \"plan_path\": \".aios/plan.json\",\n+  \"created_at\": \"2026-04-13T09:22:24.094Z\",\n+  \"output_file\": \".aios/agent-results/reviewer.json\",\n   \"request\": {\n     \"project_id\": \"pipeline-runner\",\n     \"goal\": \"Build a fully local deterministic orchestration module that runs the five completed video-language-transformation subprojects as one end-to-end pipeline, passes artifacts between them through explicit contracts, validates each stage boundary, and produces a final pipeline report with downstream-ready outputs.\"\n   },\n-  \"plan\": null,\n+  \"plan\": {\n+    \"plan_id\": \"pipeline_runner_plan_v3_final\",\n+    \"project_id\": \"pipeline-runner\",\n+    \"goal\": \"Build a fully local deterministic orchestration module that runs the five completed video-language-transformation subprojects as one end-to-end pipeline, passes artifacts between them through explicit contracts, validates each stage boundary, and produces a final pipeline report with downstream-ready outputs.\",\n+    \"summary\": \"Deterministic sequential pipeline runner with strict execution contract, isolated workspace, explicit artifact mapping, strong validation, and machine-readable reporting. Runner orchestrates and validates only, never modifies artifacts.\",\n+    \"constraints\": [\n+      \"Fully local execution only\",\n+      \"Deterministic outputs for identical inputs\",\n+      \"Strict sequential execution only\",\n+      \"Fail-fast on any stage error\",\n+      \"No implicit artifact discovery\",\n+      \"All paths must be explicit and stable\",\n+      \"Runner must not modify artifacts\",\n+      \"Runner must only orchestrate and validate\",\n+      \"All processing logic belongs to subprojects\"\n+    ],\n+    \"execution_order\": [\n+      \"work_1_runner_and_execution_contract\",\n+      \"work_2_workspace_and_contract_mapping\",\n+      \"work_3_validation_layer\",\n+      \"work_4_report_and_outputs\",\n+      \"work_5_review\",\n+      \"work_6_e2e_test\"\n+    ]\n+  },\n   \"issue\": null,\n   \"state\": {\n     \"project_id\": \"pipeline-runner\",\n     \"status\": \"READY\",\n-    \"phase\": \"PLANNING\",\n-    \"current_role\": \"planner\",\n-    \"current_work_id\": null,\n-    \"completed_roles\": [],\n-    \"completed_work_items\": [],\n+    \"phase\": \"REVIEW\",\n+    \"current_role\": \"reviewer\",\n+    \"current_work_id\": \"work_5_review\",\n+    \"completed_roles\": [\n+      \"planner\",\n+      \"coder\",\n+      \"reviewer\",\n+      \"tester\"\n+    ],\n+    \"completed_work_items\": [\n+      \"work_1_runner_and_execution_contract\",\n+      \"work_2_workspace_and_contract_mapping\",\n+      \"work_3_validation_layer\",\n+      \"work_4_report_and_outputs\"\n+    ],\n     \"open_issue_id\": null,\n-    \"force_review\": false,\n-    \"review_work_id\": null,\n+    \"force_review\": true,\n+    \"review_work_id\": \"work_4_report_and_outputs\",\n     \"blocked_issue_id\": null,\n-    \"updated_at\": \"2026-04-13T07:51:54.462Z\"\n+    \"updated_at\": \"2026-04-13T07:51:54.462Z\",\n+    \"review_base_commit\": \"12b3e4ca896cbbe355c0b011842b9d8319430465\",\n+    \"last_execution_id\": \"exec_1776072081093_tester\"\n   }\n }\ndiff --git a/.aios/logs/events.log b/.aios/logs/events.log\nindex cb3a635..1d2c587 100644\n--- a/.aios/logs/events.log\n+++ b/.aios/logs/events.log\n@@ -2,3 +2,98 @@\n {\"ts\":\"2026-04-13T07:59:25.202Z\",\"project_id\":\"pipeline-runner\",\"event\":\"AGENT_WAITING\",\"role\":\"planner\",\"prompt_file\":\"projects/pipeline-runner/.aios/planner-prompt.txt\",\"result_file\":\"projects/pipeline-runner/.aios/agent-results/planner.json\"}\n {\"ts\":\"2026-04-13T08:00:21.877Z\",\"project_id\":\"pipeline-runner\",\"event\":\"RUN_START\",\"current_role\":\"planner\",\"current_work_id\":null,\"open_issue_id\":null}\n {\"ts\":\"2026-04-13T08:00:21.882Z\",\"project_id\":\"pipeline-runner\",\"event\":\"AGENT_WAITING\",\"role\":\"planner\",\"prompt_file\":\"projects/pipeline-runner/.aios/planner-prompt.txt\",\"result_file\":\"projects/pipeline-runner/.aios/agent-results/planner.json\"}\n+{\"ts\":\"2026-04-13T08:01:08.129Z\",\"project_id\":\"pipeline-runner\",\"event\":\"RUN_START\",\"current_role\":\"planner\",\"current_work_id\":null,\"open_issue_id\":null}\n+{\"ts\":\"2026-04-13T08:01:08.135Z\",\"project_id\":\"pipeline-runner\",\"event\":\"AGENT_RESULT_CONSUMED\",\"role\":\"planner\"}\n+{\"ts\":\"2026-04-13T08:01:08.135Z\",\"project_id\":\"pipeline-runner\",\"event\":\"RUN_START\",\"current_role\":\"coder\",\"current_work_id\":\"work_1_runner_and_execution_contract\",\"open_issue_id\":null}\n+{\"ts\":\"2026-04-13T08:02:45.086Z\",\"project_id\":\"pipeline-runner\",\"event\":\"RUN_START\",\"current_role\":\"coder\",\"current_work_id\":\"work_1_runner_and_execution_contract\",\"open_issue_id\":null}\n+{\"ts\":\"2026-04-13T08:02:45.094Z\",\"project_id\":\"pipeline-runner\",\"event\":\"AGENT_WAITING\",\"role\":\"coder\",\"prompt_file\":\"projects/pipeline-runner/.aios/coder-prompt.txt\",\"result_file\":\"projects/pipeline-runner/.aios/agent-results/coder.json\"}\n+{\"ts\":\"2026-04-13T08:08:47.227Z\",\"project_id\":\"pipeline-runner\",\"event\":\"RUN_START\",\"current_role\":\"coder\",\"current_work_id\":\"work_1_runner_and_execution_contract\",\"open_issue_id\":null}\n+{\"ts\":\"2026-04-13T08:08:47.232Z\",\"project_id\":\"pipeline-ru\n... [truncated]",
+    "untracked_files": [],
+    "untracked_snippets": {}
+  },
+  "plan": {
+    "constraints": [
+      "Fully local execution only",
+      "Deterministic outputs for identical inputs",
+      "Strict sequential execution only",
+      "Fail-fast on any stage error",
+      "No implicit artifact discovery",
+      "All paths must be explicit and stable",
+      "Runner must not modify artifacts",
+      "Runner must only orchestrate and validate",
+      "All processing logic belongs to subprojects"
+    ],
+    "execution_order": [
+      "work_1_runner_and_execution_contract",
+      "work_2_workspace_and_contract_mapping",
+      "work_3_validation_layer",
+      "work_4_report_and_outputs",
+      "work_5_review",
+      "work_6_e2e_test"
+    ],
+    "goal": "Build a fully local deterministic orchestration module that runs the five completed video-language-transformation subprojects as one end-to-end pipeline, passes artifacts between them through explicit contracts, validates each stage boundary, and produces a final pipeline report with downstream-ready outputs.",
+    "plan_id": "pipeline_runner_plan_v3_final",
+    "project_id": "pipeline-runner",
+    "summary": "Deterministic sequential pipeline runner with strict execution contract, isolated workspace, explicit artifact mapping, strong validation, and machine-readable reporting. Runner orchestrates and validates only, never modifies artifacts."
+  },
+  "project_id": "pipeline-runner",
+  "request": {
+    "goal": "Build a fully local deterministic orchestration module that runs the five completed video-language-transformation subprojects as one end-to-end pipeline, passes artifacts between them through explicit contracts, validates each stage boundary, and produces a final pipeline report with downstream-ready outputs.",
+    "project_id": "pipeline-runner"
+  },
+  "state": {
+    "blocked_issue_id": null,
+    "completed_roles": [
+      "planner",
+      "coder",
+      "reviewer",
+      "tester"
+    ],
+    "completed_work_items": [
+      "work_1_runner_and_execution_contract",
+      "work_2_workspace_and_contract_mapping",
+      "work_3_validation_layer",
+      "work_4_report_and_outputs"
+    ],
+    "current_role": "reviewer",
+    "current_work_id": "work_5_review",
+    "force_review": true,
+    "last_execution_id": "exec_1776072081093_tester",
+    "open_issue_id": null,
+    "phase": "REVIEW",
+    "project_id": "pipeline-runner",
+    "review_base_commit": "12b3e4ca896cbbe355c0b011842b9d8319430465",
+    "review_work_id": "work_4_report_and_outputs",
+    "status": "READY",
+    "updated_at": "2026-04-13T07:51:54.462Z"
+  },
+  "tester_output": {
+    "execution_id": "exec_1776072081093_tester",
+    "project_id": "pipeline-runner",
+    "reasons": [
+      "Acceptance criterion 'Report contains stages, artifacts, timing' passed: full test suite and direct runtime check verified pipeline_report.json includes artifact='pipeline_report', stages array, timing_ms, and final_video_artifact metadata.",
+      "Acceptance criterion 'Final video exists' passed when produced by stage outputs: direct runtime pipeline execution with explicit final stage artifact confirmed final_video path exists and is referenced in report.",
+      "Acceptance criterion 'No artifact mutation' passed: ensureFinalVideoMp4 was invoked against an existing final_video and file mtime remained unchanged in behavioral validation.",
+      "Verification steps 'Run pipeline' and 'Inspect report' passed with real execution evidence from npm tests and direct runPipeline report inspection."
+    ],
+    "role": "tester",
+    "run_commands": [
+      "cd projects/pipeline-runner && npm test 2>&1",
+      "cd projects/pipeline-runner && node -e \"const fs=require('fs');const os=require('os');const path=require('path');const {runPipeline}=require('./src/runner/run-pipeline');const dir=fs.mkdtempSync(path.join(os.tmpdir(),'pr-w4-'));const video=path.join(dir,'in.mp4');const out=path.join(dir,'runtime');fs.writeFileSync(video,Buffer.from([1,2,3]));const finalRel=path.join('stages','final','final_video.mp4');const r=runPipeline({videoPath:video,outputDir:out,stages:[{id:'ingest_like',run:(ctx)=>{fs.mkdirSync(path.join(ctx.outputDir,'stages','ingest'),{recursive:true});fs.writeFileSync(path.join(ctx.outputDir,'stages','ingest','input_video_ref.json'),JSON.stringify({video_path:ctx.videoPath}));return {ok:true};}},{id:'final_stage',run:(ctx)=>{const p=ctx.paths.artifacts.final_video;fs.mkdirSync(path.dirname(p),{recursive:true});fs.writeFileSync(p,'final-by-stage');return {ok:true};}}]});if(!r.ok){console.error('pipeline_failed');process.exit(2);}const rp=JSON.parse(fs.readFileSync(r.pipeline_report_path,'utf8'));if(rp.artifact!=='pipeline_report'||!Array.isArray(rp.stages)||!rp.timing_ms||rp.final_video_artifact.relative_path!==finalRel){console.error('bad_report');process.exit(3);}const finalPath=path.join(out,finalRel);if(!fs.existsSync(finalPath)){console.error('missing_final');process.exit(4);}const m1=fs.statSync(finalPath).mtimeMs;const {ensureFinalVideoMp4}=require('./src/report/ensure-final-video');ensureFinalVideoMp4(out);const m2=fs.statSync(finalPath).mtimeMs;if(m1!==m2){console.error('mutated_final');process.exit(5);}console.log('ok');\""
+    ],
+    "status": "COMPLETED",
+    "summary": "Validated work_4_report_and_outputs using both automated tests and direct runtime behavioral verification. Current implementation satisfies reporting requirements, requires stage-produced final video, and preserves no-mutation behavior for existing final artifacts.",
+    "work_id": "work_4_report_and_outputs"
+  },
+  "work_item": {
+    "acceptance_criteria": [
+      "No implicit behavior",
+      "No artifact mutation",
+      "Contracts enforced"
+    ],
+    "allowed_paths": [
+      "projects/pipeline-runner/**"
+    ],
+    "artifact_expectations": {},
+    "deliverables": [
+      "reviewer.json"
+    ],
+    "depends_on": [
+      "work_4_report_and_outputs"
+    ],
+    "forbidden_dependencies": [],
+    "forbidden_paths": [],
+    "goal": "Ensure architecture compliance.",
+    "kind": "review",
+    "phase_id": "phase_4",
+    "repair_notes": [],
+    "required_artifacts": [
+      "projects/pipeline-runner/runtime/pipeline_report.json"
+    ],
+    "resolved_inputs": {},
+    "resolved_output_paths": {},
+    "review_required": true,
+    "role": "reviewer",
+    "scope_summary": "Verify contracts, determinism, and orchestration-only behavior.",
+    "test_required": false,
+    "title": "Review pipeline correctness",
+    "verification_steps": [
+      "Inspect code and outputs"
+    ],
+    "work_id": "work_5_review"
+  }
+}
+OUTPUT: projects/pipeline-runner/.aios/agent-results/reviewer.json
+OUTPUT_FORMAT:
+{
+  "execution_id": "must equal current_reviewer_execution_id",
+  "project_id": "string",
+  "reasons": [
+    "string"
+  ],
+  "requested_evidence": [
+    "string"
+  ],
+  "role": "reviewer",
+  "status": "APPROVED or REJECTED",
+  "summary": "string",
+  "work_id": "string"
+}

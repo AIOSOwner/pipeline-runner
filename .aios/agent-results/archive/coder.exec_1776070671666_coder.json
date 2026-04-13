@@ -1,0 +1,11 @@
+{
+  "execution_id": "exec_1776070671666_coder",
+  "project_id": "pipeline-runner",
+  "role": "coder",
+  "run_commands": [
+    "cd projects/pipeline-runner && npm test"
+  ],
+  "status": "COMPLETED",
+  "summary": "Implemented work_2 workspace and artifact contract mapping in src/: added explicit deterministic workspace constants and path resolver for isolated stage directories and named artifacts, added contracts document builder and contracts.json writer, and wired runPipeline to materialize stage directories and write contracts.json before stage execution. Updated pipeline context to use explicit artifact ids (including video_reference) while keeping inputVideoRef alias compatibility, updated default stage reference usage, and exported workspace APIs. Extended tests to validate deterministic workspace layout and contracts artifact mapping, plus CLI assertion for contracts.json generation. Validation passed with all tests green.",
+  "work_id": "work_2_workspace_and_contract_mapping"
+}

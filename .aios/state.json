@@ -1,14 +1,26 @@
 {
-  "project_id": "pipeline-runner",
-  "status": "READY",
-  "phase": "PLANNING",
-  "current_role": "planner",
+  "status": "DONE",
+  "phase": "DONE",
+  "current_role": null,
   "current_work_id": null,
-  "completed_roles": [],
-  "completed_work_items": [],
+  "blocked_issue_id": null,
   "open_issue_id": null,
   "force_review": false,
   "review_work_id": null,
-  "blocked_issue_id": null,
-  "updated_at": "2026-04-13T07:51:54.462Z"
+  "review_base_commit": "12b3e4ca896cbbe355c0b011842b9d8319430465",
+  "last_execution_id": "exec_1776074905063_tester",
+  "completed_roles": [
+    "planner",
+    "coder",
+    "reviewer",
+    "tester"
+  ],
+  "completed_work_items": [
+    "work_1_runner_and_execution_contract",
+    "work_2_workspace_and_contract_mapping",
+    "work_3_validation_layer",
+    "work_4_report_and_outputs",
+    "work_5_fix_report_determinism",
+    "work_6_e2e_test"
+  ]
 }

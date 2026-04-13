@@ -1,0 +1,11 @@
+{
+  "execution_id": "exec_1776067365092_coder",
+  "project_id": "pipeline-runner",
+  "role": "coder",
+  "run_commands": [
+    "cd projects/pipeline-runner && npm test"
+  ],
+  "status": "COMPLETED",
+  "summary": "Implemented work_1 runner contract in allowed paths: added single execution model wrapper invokeStage using spawnSync-only execution, deterministic runPipeline with explicit ordered stages and fail-fast stopping, explicit workspace path resolution via pipeline context, default ingest stages that pass explicit input/output paths through env, CLI entrypoint requiring --video and --output-dir, and exports in src/index.js. Added deterministic tests for execution ordering, fail-fast behavior, invoke-stage execution model, CLI argument handling, and pipeline context path resolution. Updated package test script to the work_1 test suite and validated all tests pass.",
+  "work_id": "work_1_runner_and_execution_contract"
+}

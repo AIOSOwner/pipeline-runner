@@ -1,0 +1,11 @@
+{
+  "execution_id": "exec_1776071799548_coder",
+  "project_id": "pipeline-runner",
+  "role": "coder",
+  "run_commands": [
+    "cd projects/pipeline-runner && npm test 2>&1"
+  ],
+  "status": "COMPLETED",
+  "summary": "Fixed rejected work_4 behavior by removing runner-level final video synthesis. Updated ensureFinalVideoMp4 to strictly verify presence of final_video artifact and fail when missing, preserving orchestration-only constraints and preventing artifact mutation by the runner. Kept deterministic pipeline_report generation and failure reporting paths, and updated tests to reflect the corrected contract: default stages/CLI now fail when final_video is absent, while successful pipelines must produce final_video via stages. Report tests now validate existence-only verification and no mutation semantics. Full test suite passes.",
+  "work_id": "work_4_report_and_outputs"
+}

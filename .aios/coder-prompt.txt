@@ -1,0 +1,218 @@
+ROLE: CODER
+TASK: Implement current work item
+READ:
+projects/pipeline-runner/.aios/execution.json
+projects/pipeline-runner/.aios/work_items/work_1_runner_and_execution_contract.json
+RULES:
+- output json only
+- output must exactly match the specified output format
+- output JSON must include role="coder" at top-level
+- output JSON must include project_id, work_id, and execution_id
+- output JSON execution_id must equal current_coder_execution_id
+- status must be one of: COMPLETED, FAILED
+- summary must be clear and factual
+- work only on the current work item
+- only modify allowed_paths
+- run_commands must list the exact commands used for validation
+- use execution.work_item.resolved_inputs as the primary input source
+- use execution.work_item.required_artifacts only for upstream artifacts explicitly listed for the current work
+- use execution.work_item.resolved_output_paths for output targets
+- do not read request.json directly
+- do not infer project input outside execution context
+- do not hardcode input values or output paths
+- outputs must strictly satisfy structure, artifact, and acceptance constraints defined by the current work item
+- if the work item changes behavior, update directly affected tests and docs only if they are within allowed_paths
+- do not weaken implementation merely to satisfy an outdated test
+- if a test failure is caused by a contract change and the directly affected test is within allowed_paths, update the test to match the new contract
+- if a test failure is caused by a contract change but the directly affected test is outside allowed_paths, return status="FAILED" instead of editing out-of-scope files
+- use repair_notes as guidance for likely failure modes and scope-sensitive decisions
+- prefer deterministic implementations and deterministic validation commands
+- return status="FAILED" when current work cannot be completed within allowed_paths, execution scope, dependencies, or runtime constraints
+- do not fake completion when blocked by scope, dependencies, contract mismatch, or missing required runtime conditions
+- when status="FAILED", include failure_code, failure_type, and failure_details
+- failure_type must be one of blocker, implementation, or contract
+- failure_details must stay machine-readable and specific
+- if resolved_inputs are insufficient to execute the work, return status="FAILED" rather than guessing missing data
+- if directly affected tests or docs are outside allowed_paths, classify as failure_type="blocker"
+- if code is incorrect but fixable within current scope, classify as failure_type="implementation"
+- if output contract, execution metadata, or prompt/runtime contract is invalid, classify as failure_type="contract"
+- failed_checks should list the concrete failing tests, validations, or acceptance criteria when known
+- affected_paths should list the concrete files that caused or would be needed to resolve the failure when known
+- do not invent or modify human_override fields
+- human override is handled outside coder execution; your responsibility is to report failure truthfully and precisely
+- do not include written_files in coder output
+- source changes for review will be derived from git history, not from coder.json
+CONTEXT:
+{
+  "current_coder_execution_id": "exec_1776075006090_coder",
+  "execution": {
+    "constraints": [],
+    "created_at": "2026-04-13T10:10:06.090Z",
+    "current_work_id": "work_1_runner_and_execution_contract",
+    "execution_id": "exec_1776075006090_coder",
+    "goal": "Build a fully local deterministic orchestration module that runs the five completed video-language-transformation subprojects as one end-to-end pipeline, passes artifacts between them through explicit contracts, validates each stage boundary, and produces a final pipeline report with downstream-ready outputs.",
+    "issue": null,
+    "issue_id": null,
+    "mode": "EXECUTE",
+    "output_file": ".aios/agent-results/coder.json",
+    "plan": {
+      "constraints": [
+        "Fully local execution only",
+        "Deterministic outputs for identical inputs",
+        "Strict sequential execution only",
+        "Fail-fast on any stage error",
+        "No implicit artifact discovery",
+        "All paths must be explicit and stable",
+        "Runner must not modify artifacts",
+        "Runner must only orchestrate and validate",
+        "All processing logic belongs to subprojects"
+      ],
+      "execution_order": [
+        "work_1_runner_and_execution_contract",
+        "work_2_workspace_and_contract_mapping",
+        "work_3_validation_layer",
+        "work_4_report_and_outputs",
+        "work_5_review",
+        "work_6_e2e_test"
+      ],
+      "goal": "Build a fully local deterministic orchestration module that runs the five completed video-language-transformation subprojects as one end-to-end pipeline, passes artifacts between them through explicit contracts, validates each stage boundary, and produces a final pipeline report with downstream-ready outputs.",
+      "plan_id": "pipeline_runner_plan_v3_final",
+      "project_id": "pipeline-runner",
+      "summary": "Deterministic sequential pipeline runner with strict execution contract, isolated workspace, explicit artifact mapping, strong validation, and machine-readable reporting. Runner orchestrates and validates only, never modifies artifacts."
+    },
+    "plan_path": ".aios/plan.json",
+    "project_id": "pipeline-runner",
+    "request": {
+      "goal": "Build a fully local deterministic orchestration module that runs the five completed video-language-transformation subprojects as one end-to-end pipeline, passes artifacts between them through explicit contracts, validates each stage boundary, and produces a final pipeline report with downstream-ready outputs.",
+      "project_id": "pipeline-runner"
+    },
+    "request_path": ".aios/request.json",
+    "role": "coder",
+    "state": {
+      "blocked_issue_id": null,
+      "completed_roles": [
+        "coder",
+        "tester"
+      ],
+      "completed_work_items": [
+        "work_6_e2e_test"
+      ],
+      "current_role": "coder",
+      "current_work_id": "work_1_runner_and_execution_contract",
+      "force_review": false,
+      "last_execution_id": "exec_1776074905063_tester",
+      "open_issue_id": null,
+      "phase": "EXECUTION",
+      "review_base_commit": "12b3e4ca896cbbe355c0b011842b9d8319430465",
+      "review_work_id": null,
+      "status": "READY"
+    },
+    "success_criteria": [],
+    "work_id": "work_1_runner_and_execution_contract"
+  },
+  "project_id": "pipeline-runner",
+  "state": {
+    "blocked_issue_id": null,
+    "completed_roles": [
+      "coder",
+      "tester"
+    ],
+    "completed_work_items": [
+      "work_6_e2e_test"
+    ],
+    "current_role": "coder",
+    "current_work_id": "work_1_runner_and_execution_contract",
+    "force_review": false,
+    "last_execution_id": "exec_1776074905063_tester",
+    "open_issue_id": null,
+    "phase": "EXECUTION",
+    "review_base_commit": "12b3e4ca896cbbe355c0b011842b9d8319430465",
+    "review_work_id": null,
+    "status": "READY"
+  },
+  "work_item": {
+    "acceptance_criteria": [
+      "Single execution model used for all stages",
+      "Stages invoked deterministically",
+      "Fail-fast enforced",
+      "No implicit behavior"
+    ],
+    "allowed_paths": [
+      "projects/pipeline-runner/src/**",
+      "projects/pipeline-runner/tests/**",
+      "projects/pipeline-runner/package.json",
+      "projects/pipeline-runner/README.md"
+    ],
+    "artifact_expectations": {},
+    "deliverables": [
+      "runPipeline function",
+      "CLI entrypoint",
+      "stage invocation wrapper"
+    ],
+    "depends_on": [],
+    "forbidden_dependencies": [
+      "projects/pipeline-runner/.aios/request.json"
+    ],
+    "forbidden_paths": [
+      "projects/video-*/**"
+    ],
+    "goal": "Create deterministic pipeline runner with a single explicit stage execution model.",
+    "kind": "implementation",
+    "phase_id": "phase_1",
+    "repair_notes": [
+      "If multiple execution styles exist → FAIL",
+      "If CLI behavior differs between stages → FAIL"
+    ],
+    "required_artifacts": [],
+    "resolved_inputs": {
+      "output_dir": "CLI argument",
+      "video_path": "CLI argument"
+    },
+    "resolved_output_paths": {
+      "workspace_root": "projects/pipeline-runner/runtime/"
+    },
+    "review_required": true,
+    "role": "coder",
+    "scope_summary": "Implement runPipeline, CLI entrypoint, and enforce a single consistent stage invocation model.",
+    "stage_execution_rules": [
+      "Pipeline runner must use one single documented execution model for all stage invocations.",
+      "The chosen execution model must be implemented consistently in code, tests, and docs.",
+      "Runner must not support parallel invocation models.",
+      "Each stage must receive explicit input paths.",
+      "Runner must pass explicit output_dir per stage.",
+      "Stage outputs must be resolved from output_dir only."
+    ],
+    "test_required": true,
+    "title": "Implement pipeline runner and single execution model",
+    "verification_steps": [
+      "Run pipeline",
+      "Verify execution order",
+      "Verify failure stops pipeline"
+    ],
+    "work_id": "work_1_runner_and_execution_contract"
+  }
+}
+OUTPUT: projects/pipeline-runner/.aios/agent-results/coder.json
+OUTPUT_FORMAT:
+{
+  "execution_id": "must equal current_coder_execution_id",
+  "failure_code": "required when status=FAILED",
+  "failure_details": {
+    "affected_paths": [
+      "string"
+    ],
+    "failed_checks": [
+      "string"
+    ],
+    "message": "required when status=FAILED"
+  },
+  "failure_type": "required when status=FAILED: blocker|implementation|contract",
+  "project_id": "string",
+  "role": "coder",
+  "run_commands": [
+    "string"
+  ],
+  "status": "COMPLETED or FAILED",
+  "summary": "string",
+  "work_id": "work_1_runner_and_execution_contract"
+}

@@ -1,0 +1,70 @@
+{
+  "work_id": "work_2_workspace_and_contract_mapping",
+  "phase_id": "phase_2",
+  "title": "Implement workspace and artifact contracts",
+  "role": "coder",
+  "kind": "integration",
+  "goal": "Create isolated workspace and explicit artifact mapping across stages.",
+  "scope_summary": "Define stage directories and map artifacts strictly between stages.",
+  "allowed_paths": [
+    "projects/pipeline-runner/src/**",
+    "projects/pipeline-runner/tests/**"
+  ],
+  "resolved_inputs": {},
+  "resolved_output_paths": {
+    "ingest": "projects/pipeline-runner/runtime/stages/ingest/",
+    "transcript": "projects/pipeline-runner/runtime/stages/transcript/",
+    "dubbing": "projects/pipeline-runner/runtime/stages/dubbing/",
+    "subtitle": "projects/pipeline-runner/runtime/stages/subtitle/",
+    "final": "projects/pipeline-runner/runtime/stages/final/",
+    "contracts": "projects/pipeline-runner/runtime/contracts.json"
+  },
+  "required_artifacts": [],
+  "artifact_expectations": {
+    "video_reference": "projects/pipeline-runner/runtime/stages/ingest/input_video_ref.json",
+    "audio": "runtime/stages/ingest/audio/source_full.wav",
+    "timeline": "runtime/stages/ingest/timeline.json",
+    "translated_transcript": "runtime/stages/transcript/translated_transcript.json",
+    "dubbed_audio": "runtime/stages/dubbing/dubbed_audio/full.wav",
+    "subtitle": "runtime/stages/subtitle/subtitles_translated.srt"
+  },
+  "deliverables": [
+    "workspace structure",
+    "contracts.json",
+    "artifact mapping logic"
+  ],
+  "acceptance_criteria": [
+    "Each stage has isolated directory",
+    "No artifact inferred",
+    "video_path represented as reference artifact",
+    "All paths deterministic"
+  ],
+  "verification_steps": [
+    "Inspect workspace layout",
+    "Inspect contracts.json"
+  ],
+  "depends_on": [
+    "work_1_runner_and_execution_contract"
+  ],
+  "forbidden_dependencies": [
+    "projects/pipeline-runner/.aios/request.json"
+  ],
+  "repair_notes": [
+    "If raw string path used instead of reference artifact → FAIL",
+    "If any stage reads outside its directory → FAIL"
+  ],
+  "review_required": true,
+  "test_required": true,
+  "workspace_rules": [
+    "Each stage must have isolated output_dir",
+    "runtime/stages/ingest/",
+    "runtime/stages/transcript/",
+    "runtime/stages/dubbing/",
+    "runtime/stages/subtitle/",
+    "runtime/stages/final/"
+  ],
+  "artifact_contract_rules": [
+    "String references must be materialized as artifacts",
+    "No special-case raw path handling"
+  ]
+}
