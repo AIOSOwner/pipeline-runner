@@ -1,0 +1,14 @@
+{
+  "project_id": "pipeline-runner",
+  "status": "READY",
+  "phase": "PLANNING",
+  "current_role": "planner",
+  "current_work_id": null,
+  "completed_roles": [],
+  "completed_work_items": [],
+  "open_issue_id": null,
+  "force_review": false,
+  "review_work_id": null,
+  "blocked_issue_id": null,
+  "updated_at": "2026-04-13T07:51:54.462Z"
+}

@@ -1,0 +1,4 @@
+{
+  "project_id": "pipeline-runner",
+  "goal": "Build a fully local deterministic orchestration module that runs the five completed video-language-transformation subprojects as one end-to-end pipeline, passes artifacts between them through explicit contracts, validates each stage boundary, and produces a final pipeline report with downstream-ready outputs."
+}
