@@ -1,36 +1,35 @@
 'use strict';
 
 const path = require('node:path');
-const { invokeStage } = require('./invoke-stage');
 
 function getDefaultStages() {
-  const bootstrapScript = path.join(__dirname, '..', 'stage-scripts', 'bootstrap-ingest.js');
-  const verifyScript = path.join(__dirname, '..', 'stage-scripts', 'verify-ingest-ref.js');
+  const projectsRoot = path.resolve(__dirname, '..', '..', '..');
 
   return [
     {
-      id: 'ingest_bootstrap',
-      run: (ctx) =>
-        invokeStage({
-          command: process.execPath,
-          args: [bootstrapScript],
-          env: {
-            PIPELINE_VIDEO_PATH: ctx.videoPath,
-            PIPELINE_OUTPUT_DIR: ctx.outputDir,
-          },
-        }),
+      stage_id: 'ingest',
+      entrypoint: path.join(projectsRoot, 'video-ingest-standardizer', 'src', 'index.js'),
+      input: {},
     },
     {
-      id: 'ingest_verify_ref',
-      run: (ctx) =>
-        invokeStage({
-          command: process.execPath,
-          args: [verifyScript],
-          env: {
-            PIPELINE_VIDEO_PATH: ctx.videoPath,
-            PIPELINE_INPUT_VIDEO_REF: ctx.paths.artifacts.video_reference,
-          },
-        }),
+      stage_id: 'transcript',
+      entrypoint: path.join(projectsRoot, 'audio-transcript-transformer', 'src', 'index.js'),
+      input: {},
+    },
+    {
+      stage_id: 'subtitle',
+      entrypoint: path.join(projectsRoot, 'subtitle-video-rebuilder', 'src', 'index.js'),
+      input: {},
+    },
+    {
+      stage_id: 'dub_audio',
+      entrypoint: path.join(projectsRoot, 'dubbed-audio-rebuilder', 'src', 'index.js'),
+      input: {},
+    },
+    {
+      stage_id: 'final',
+      entrypoint: path.join(projectsRoot, 'video-final-composer', 'src', 'index.js'),
+      input: {},
     },
   ];
 }

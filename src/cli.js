@@ -6,22 +6,25 @@ const { getDefaultStages } = require('./runner/default-stages');
 
 function parseArgs(argv) {
   let videoPath = null;
+  let targetLanguage = null;
   let outputDir = null;
   for (let i = 2; i < argv.length; i++) {
     const arg = argv[i];
     if (arg === '--video' || arg === '-v') {
       videoPath = argv[++i] || null;
+    } else if (arg === '--target-language' || arg === '-t') {
+      targetLanguage = argv[++i] || null;
     } else if (arg === '--output-dir' || arg === '-o') {
       outputDir = argv[++i] || null;
     }
   }
-  return { videoPath, outputDir };
+  return { videoPath, targetLanguage, outputDir };
 }
 
 function main(argv = process.argv) {
-  const { videoPath, outputDir } = parseArgs(argv);
-  if (!videoPath || !outputDir) {
-    process.stderr.write('Usage: pipeline-runner --video <path> --output-dir <path>\n');
+  const { videoPath, targetLanguage, outputDir } = parseArgs(argv);
+  if (!videoPath || !targetLanguage || !outputDir) {
+    process.stderr.write('Usage: pipeline-runner --video <path> --target-language <lang> --output-dir <path>\n');
     return 2;
   }
 
@@ -32,10 +35,18 @@ function main(argv = process.argv) {
     return 2;
   }
 
+  const stages = getDefaultStages().map((s) => ({
+    ...s,
+    input: {
+      ...s.input,
+      video_path: videoPath,
+      target_language: targetLanguage,
+    },
+  }));
+
   const result = runPipeline({
-    videoPath,
-    outputDir,
-    stages: getDefaultStages(),
+    runtimeRoot: outputDir,
+    stages,
   });
 
   if (!result.ok) {

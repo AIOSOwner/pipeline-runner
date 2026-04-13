@@ -9,7 +9,7 @@
     "pipeline-runner": "./src/cli.js"
   },
   "scripts": {
-    "test": "node --test tests/run-pipeline.test.js tests/cli.test.js tests/pipeline-context.test.js tests/validation.test.js tests/report.test.js"
+    "test": "node --test tests/stage-runtime.test.js tests/run-pipeline.test.js tests/workspace.test.js tests/cli.test.js"
   },
   "engines": {
     "node": ">=18"

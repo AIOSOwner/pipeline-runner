@@ -2,102 +2,89 @@
 
 const fs = require('node:fs');
 const { EXECUTION_MODEL } = require('./invoke-stage');
-const { buildPipelineContext } = require('./pipeline-context');
-const { ensureWorkspaceLayout, writeContractsFile } = require('../workspace/workspace');
-const { ensureFinalVideoMp4 } = require('../report/ensure-final-video');
-const { writePipelineReportFile } = require('../report/pipeline-report');
+const path = require('node:path');
+const { runBlackboxStage } = require('./stage-runtime');
+const { stableStringify } = require('./json-stable');
+
+function writePipelineReport(runtimeRoot, trace) {
+  const reportPath = path.join(path.resolve(runtimeRoot), 'pipeline_report.json');
+  const report = {
+    overall_status: trace.every((s) => s.status === 'COMPLETED') ? 'COMPLETED' : 'FAILED',
+    stages: trace.map((s) => ({
+      stage_id: s.stage_id,
+      status: s.status,
+      artifacts: s.artifacts || {},
+      timing_ms: 0,
+    })),
+    final_video_path: null,
+  };
+  for (const stage of trace) {
+    if (stage.artifacts && typeof stage.artifacts.final_video_path === 'string') {
+      report.final_video_path = stage.artifacts.final_video_path;
+    }
+  }
+  fs.mkdirSync(path.dirname(reportPath), { recursive: true });
+  fs.writeFileSync(reportPath, stableStringify(report), 'utf8');
+  return reportPath;
+}
 
 function runPipeline(options) {
-  const { videoPath, outputDir, stages, pipelineReportPath } = options || {};
-  if (!videoPath) {
-    throw new Error('runPipeline: videoPath is required');
-  }
-  if (!outputDir) {
-    throw new Error('runPipeline: outputDir is required');
+  const { runtimeRoot, stages } = options || {};
+  if (!runtimeRoot) {
+    throw new Error('runPipeline: runtimeRoot is required');
   }
   if (!Array.isArray(stages)) {
     throw new Error('runPipeline: stages must be an array');
   }
 
-  const ctx = buildPipelineContext(videoPath, outputDir);
-  fs.mkdirSync(ctx.outputDir, { recursive: true });
-  ensureWorkspaceLayout(ctx.outputDir);
-  writeContractsFile(ctx.outputDir);
-
+  fs.mkdirSync(path.resolve(runtimeRoot, 'stages'), { recursive: true });
   const trace = [];
-  const stageTimingsMs = [];
+
   for (let i = 0; i < stages.length; i++) {
     const stage = stages[i];
-    if (!stage || typeof stage.run !== 'function') {
+    if (!stage || typeof stage !== 'object') {
       throw new Error(`runPipeline: invalid stage at index ${i}`);
     }
-    const id = stage.id ? String(stage.id) : `stage_${i}`;
-    const result = stage.run(ctx);
-    stageTimingsMs.push(0);
-    const ok = Boolean(result && (result.ok === true || result.status === 0));
-    trace.push({ id, ok });
-    if (!ok) {
-      const { reportPath } = writePipelineReportFile({
-        workspaceRoot: ctx.outputDir,
-        reportPath: pipelineReportPath,
-        pipelineOk: false,
-        trace,
-        stageTimingsMs,
-        ensureFinalVideo: { skipped: true, reason: 'pipeline_failed' },
-      });
+    const stageId = stage.stage_id ? String(stage.stage_id) : `stage_${i}`;
+    if (!stage.entrypoint || typeof stage.entrypoint !== 'string') {
+      throw new Error(`runPipeline: stage ${stageId} missing entrypoint`);
+    }
+
+    const input = stage.input && typeof stage.input === 'object' ? stage.input : {};
+    const r = runBlackboxStage({
+      runtimeRoot,
+      stageId,
+      stageEntrypoint: stage.entrypoint,
+      input,
+    });
+
+    if (!r.ok) {
+      trace.push({ stage_id: stageId, status: 'FAILED', artifacts: {}, error: r.error });
+      const reportPath = writePipelineReport(runtimeRoot, trace);
       return {
         ok: false,
         executionModel: EXECUTION_MODEL,
-        trace,
-        failedStageId: id,
+        trace: trace.map((t) => ({ id: t.stage_id, ok: t.status === 'COMPLETED' })),
+        failedStageId: stageId,
         stoppedAt: i,
-        stage_timings_ms: stageTimingsMs,
         pipeline_report_path: reportPath,
       };
     }
-  }
 
-  let ensureFinalVideo;
-  try {
-    ensureFinalVideo = ensureFinalVideoMp4(ctx.outputDir);
-  } catch (err) {
-    const { reportPath } = writePipelineReportFile({
-      workspaceRoot: ctx.outputDir,
-      reportPath: pipelineReportPath,
-      pipelineOk: false,
-      trace,
-      stageTimingsMs,
-      ensureFinalVideo: {
-        skipped: true,
-        error: err && err.message ? err.message : String(err),
-      },
+    trace.push({
+      stage_id: stageId,
+      status: String(r.stageOutput.status).toUpperCase(),
+      artifacts: r.stageOutput.artifacts,
     });
-    return {
-      ok: false,
-      executionModel: EXECUTION_MODEL,
-      trace,
-      failedStageId: 'ensure_final_video',
-      stage_timings_ms: stageTimingsMs,
-      pipeline_report_path: reportPath,
-    };
   }
 
-  const { reportPath } = writePipelineReportFile({
-    workspaceRoot: ctx.outputDir,
-    reportPath: pipelineReportPath,
-    pipelineOk: true,
-    trace,
-    stageTimingsMs,
-    ensureFinalVideo,
-  });
+  const reportPath = writePipelineReport(runtimeRoot, trace);
 
   return {
     ok: true,
     executionModel: EXECUTION_MODEL,
-    trace,
-    stage_timings_ms: stageTimingsMs,
+    trace: trace.map((t) => ({ id: t.stage_id, ok: t.status === 'COMPLETED' })),
     pipeline_report_path: reportPath,
-    ensure_final_video: ensureFinalVideo,
   };
 }
 
